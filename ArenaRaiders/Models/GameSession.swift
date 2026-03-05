@@ -1,5 +1,4 @@
 import Foundation
-import SwiftData
 
 // MARK: - Active Gear (Codable wrapper for gear slot mapping)
 
@@ -151,7 +150,6 @@ enum StatusEffectType: String, Codable {
 
 // MARK: - Game Session
 
-@Model
 final class GameSession {
     var id: UUID
     var phase: GamePhase

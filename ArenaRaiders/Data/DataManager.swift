@@ -11,9 +11,7 @@ struct DataManager {
             PlayerProfile.self,
             Champion.self,
             Card.self,
-            Deck.self,
-            TreasureChest.self,
-            GameSession.self
+            Deck.self
         ])
 
         let modelConfiguration = ModelConfiguration(

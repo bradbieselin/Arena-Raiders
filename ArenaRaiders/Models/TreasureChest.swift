@@ -1,7 +1,5 @@
 import Foundation
-import SwiftData
 
-@Model
 final class TreasureChest {
     var id: UUID
     var integrity: Int

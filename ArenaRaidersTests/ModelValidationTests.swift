@@ -72,9 +72,7 @@ final class ModelValidationTests: XCTestCase {
             PlayerProfile.self,
             Champion.self,
             Card.self,
-            Deck.self,
-            TreasureChest.self,
-            GameSession.self
+            Deck.self
         ])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         return try ModelContainer(for: schema, configurations: [config])
