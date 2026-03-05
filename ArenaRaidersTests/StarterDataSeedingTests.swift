@@ -382,9 +382,7 @@ final class StarterDataSeedingTests: XCTestCase {
         context.insert(profile)
 
         // Unlock all champions
-        for champion in championMap.values {
-            profile.unlockedChampions.append(champion)
-        }
+        profile.unlockedChampions = Array(championMap.values)
 
         // Add all cards to collection
         for card in cardMap.values {
@@ -392,26 +390,26 @@ final class StarterDataSeedingTests: XCTestCase {
         }
 
         // Build starter decks
+        var decks: [Deck] = []
         for starterDeck in starterData.starterDecks {
             guard let deckChampion = championMap[starterDeck.champion] else { continue }
 
-            var deckCards: [Card] = []
+            var cardSlots: [DeckCardSlot] = []
             for entry in starterDeck.cardList {
                 if let card = cardMap[entry.id] {
-                    for _ in 0..<entry.qty {
-                        deckCards.append(card)
-                    }
+                    cardSlots.append(DeckCardSlot(card: card, quantity: entry.qty))
                 }
             }
 
             let deck = Deck(
                 name: starterDeck.name,
                 champion: deckChampion,
-                cards: deckCards
+                cardSlots: cardSlots
             )
             context.insert(deck)
-            profile.savedDecks.append(deck)
+            decks.append(deck)
         }
+        profile.savedDecks = decks
 
         profile.hasCompletedFirstLaunch = true
         try? context.save()

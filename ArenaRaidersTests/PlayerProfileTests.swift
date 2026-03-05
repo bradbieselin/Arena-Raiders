@@ -193,7 +193,7 @@ final class PlayerProfileTests: XCTestCase {
         context.insert(champion)
         profile.unlockedChampions.append(champion)
 
-        let deck = Deck(name: "Test Deck", champion: champion, cards: [])
+        let deck = Deck(name: "Test Deck", champion: champion, cardSlots: [])
         context.insert(deck)
         profile.savedDecks.append(deck)
 

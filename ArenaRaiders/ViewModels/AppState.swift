@@ -42,8 +42,8 @@ final class AppState {
         }
     }
 
-    func startNewGame(champion: Champion? = nil, deck: Deck? = nil) {
-        gameSession = GameSession(champion: champion, deck: deck)
+    func startNewGame(champion: Champion? = nil, deckCards: [CardReference] = []) {
+        gameSession = GameSession(champion: champion, deckCards: deckCards)
         navigateTo(.game)
     }
 

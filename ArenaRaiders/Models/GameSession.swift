@@ -206,13 +206,13 @@ final class GameSession {
     init(
         phase: GamePhase = .raid,
         champion: Champion? = nil,
-        deck: Deck? = nil
+        deckCards: [CardReference] = []
     ) {
         self.id = UUID()
         self.phase = phase
         self.playerChampion = champion.map { ChampionReference(champion: $0) }
         self.playerHand = []
-        self.playerDeck = deck?.cards.map { CardReference(card: $0) } ?? []
+        self.playerDeck = deckCards
         self.playerDiscard = []
         self.playerResources = GameSession.startingResources
         self.playerHP = champion?.hp ?? 30

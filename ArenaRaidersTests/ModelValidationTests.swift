@@ -257,36 +257,36 @@ final class ModelValidationTests: XCTestCase {
     // MARK: - Deck Validation
 
     func testDeckRequiresExactly40Cards() {
-        let cards39 = (0..<39).map { i in
-            makeCard(stringId: "card_\(i)", name: "Card \(i)")
+        let slots39 = (0..<39).map { i in
+            DeckCardSlot(card: makeCard(stringId: "card_\(i)", name: "Card \(i)"))
         }
-        let deck39 = Deck(name: "Incomplete", champion: makeChampion(), cards: cards39)
+        let deck39 = Deck(name: "Incomplete", champion: makeChampion(), cardSlots: slots39)
         XCTAssertFalse(deck39.isComplete)
         XCTAssertEqual(deck39.cardCount, 39)
         XCTAssertEqual(deck39.cardsNeeded, 1)
 
-        let cards40 = (0..<40).map { i in
-            makeCard(stringId: "card_\(i)", name: "Card \(i)")
+        let slots40 = (0..<40).map { i in
+            DeckCardSlot(card: makeCard(stringId: "card_\(i)", name: "Card \(i)"))
         }
-        let deck40 = Deck(name: "Complete", champion: makeChampion(), cards: cards40)
+        let deck40 = Deck(name: "Complete", champion: makeChampion(), cardSlots: slots40)
         XCTAssertTrue(deck40.isComplete)
         XCTAssertEqual(deck40.cardCount, 40)
         XCTAssertEqual(deck40.cardsNeeded, 0)
 
-        let cards41 = (0..<41).map { i in
-            makeCard(stringId: "card_\(i)", name: "Card \(i)")
+        let slots41 = (0..<41).map { i in
+            DeckCardSlot(card: makeCard(stringId: "card_\(i)", name: "Card \(i)"))
         }
-        let deck41 = Deck(name: "Overfull", champion: makeChampion(), cards: cards41)
+        let deck41 = Deck(name: "Overfull", champion: makeChampion(), cardSlots: slots41)
         XCTAssertFalse(deck41.isComplete, "A deck with 41 cards should not be marked complete")
         XCTAssertEqual(deck41.cardCount, 41)
         XCTAssertEqual(deck41.cardsNeeded, 0) // max(0, 40 - 41) = 0
     }
 
     func testDeckWithoutChampionIsNotComplete() {
-        let cards40 = (0..<40).map { i in
-            makeCard(stringId: "card_\(i)", name: "Card \(i)")
+        let slots40 = (0..<40).map { i in
+            DeckCardSlot(card: makeCard(stringId: "card_\(i)", name: "Card \(i)"))
         }
-        let deck = Deck(name: "No Champion", champion: nil, cards: cards40)
+        let deck = Deck(name: "No Champion", champion: nil, cardSlots: slots40)
         XCTAssertFalse(deck.isComplete, "A deck without a champion should not be complete")
     }
 
@@ -350,8 +350,8 @@ final class ModelValidationTests: XCTestCase {
         let cards = (0..<5).map { i in
             makeCard(stringId: "deck_card_\(i)", name: "Deck Card \(i)")
         }
-        let deck = Deck(name: "Test Deck", champion: champion, cards: cards)
-        let session = GameSession(champion: champion, deck: deck)
+        let deckCards = cards.map { CardReference(card: $0) }
+        let session = GameSession(champion: champion, deckCards: deckCards)
 
         // Phase defaults to raid
         XCTAssertEqual(session.phase, .raid)

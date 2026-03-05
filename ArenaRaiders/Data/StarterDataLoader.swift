@@ -159,10 +159,8 @@ struct StarterDataLoader {
         let profile = PlayerProfile(currency: 100)
         context.insert(profile)
 
-        // Unlock all 6 champions
-        for champion in championMap.values {
-            profile.unlockedChampions.append(champion)
-        }
+        // Unlock all 6 champions (batch assignment for SwiftData compatibility)
+        profile.unlockedChampions = Array(championMap.values)
 
         // Add all 60 cards to player's card collection (1 copy each)
         for card in cardMap.values {
@@ -170,26 +168,26 @@ struct StarterDataLoader {
         }
 
         // Build both starter decks
+        var decks: [Deck] = []
         for starterDeck in starterData.starterDecks {
             guard let deckChampion = championMap[starterDeck.champion] else { continue }
 
-            var deckCards: [Card] = []
+            var slots: [DeckCardSlot] = []
             for entry in starterDeck.cardList {
                 if let card = cardMap[entry.id] {
-                    for _ in 0..<entry.qty {
-                        deckCards.append(card)
-                    }
+                    slots.append(DeckCardSlot(card: card, quantity: entry.qty))
                 }
             }
 
             let deck = Deck(
                 name: starterDeck.name,
                 champion: deckChampion,
-                cards: deckCards
+                cardSlots: slots
             )
             context.insert(deck)
-            profile.savedDecks.append(deck)
+            decks.append(deck)
         }
+        profile.savedDecks = decks
 
         profile.hasCompletedFirstLaunch = true
 
