@@ -260,6 +260,7 @@ final class StarterDataSeedingTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testSeedLogicStartingCurrency() throws {
         // Verify PlayerProfile defaults when created with currency 100
         let container = try ModelContainer(
