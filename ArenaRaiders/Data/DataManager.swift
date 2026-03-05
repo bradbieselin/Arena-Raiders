@@ -9,8 +9,10 @@ struct DataManager {
     init() {
         let schema = Schema([
             PlayerProfile.self,
+            Champion.self,
             Card.self,
             Deck.self,
+            TreasureChest.self,
             GameSession.self
         ])
 

@@ -5,24 +5,27 @@ import SwiftData
 final class Deck {
     var id: UUID
     var name: String
+    var champion: Champion?
     var cards: [Card]
-    var owner: PlayerProfile?
-    var createdAt: Date
 
-    static let maxCards = 30
+    static let requiredCardCount = 40
 
-    init(name: String = "New Deck", cards: [Card] = []) {
+    init(name: String = "New Deck", champion: Champion? = nil, cards: [Card] = []) {
         self.id = UUID()
         self.name = name
+        self.champion = champion
         self.cards = cards
-        self.createdAt = Date()
     }
 
     var isComplete: Bool {
-        cards.count == Deck.maxCards
+        champion != nil && cards.count == Deck.requiredCardCount
     }
 
     var cardCount: Int {
         cards.count
+    }
+
+    var cardsNeeded: Int {
+        max(0, Deck.requiredCardCount - cards.count)
     }
 }

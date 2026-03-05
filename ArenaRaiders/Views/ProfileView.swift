@@ -32,11 +32,11 @@ struct ProfileView: View {
                             }
                             .padding(.top, 20)
 
-                            Text(profile.username)
+                            Text(profile.displayName)
                                 .font(.title.bold())
                                 .foregroundColor(.white)
 
-                            Text("Level \(profile.level)")
+                            Text("\(profile.totalGames) Games Played")
                                 .font(.subheadline)
                                 .foregroundColor(gold)
 
@@ -45,10 +45,10 @@ struct ProfileView: View {
                                 GridItem(.flexible()),
                                 GridItem(.flexible())
                             ], spacing: 16) {
-                                StatCard(title: "Trophies", value: "\(profile.trophies)", icon: "trophy.fill")
-                                StatCard(title: "Games", value: "\(profile.gamesPlayed)", icon: "gamecontroller.fill")
-                                StatCard(title: "Gold", value: "\(profile.gold)", icon: "dollarsign.circle.fill")
-                                StatCard(title: "Gems", value: "\(profile.gems)", icon: "diamond.fill")
+                                StatCard(title: "Wins", value: "\(profile.totalWins)", icon: "trophy.fill")
+                                StatCard(title: "Losses", value: "\(profile.totalLosses)", icon: "xmark.shield.fill")
+                                StatCard(title: "Cards", value: "\(profile.uniqueCardsOwned)", icon: "rectangle.stack.fill")
+                                StatCard(title: "Currency", value: "\(profile.currency)", icon: "dollarsign.circle.fill")
                             }
                             .padding(.horizontal)
 

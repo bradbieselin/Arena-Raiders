@@ -1,52 +1,97 @@
 import Foundation
 import SwiftData
 
+// MARK: - Owned Card Entry (tracks quantity of each card owned)
+
+struct OwnedCardEntry: Codable, Equatable, Hashable, Identifiable {
+    let cardId: UUID
+    let cardName: String
+    var quantity: Int
+
+    var id: UUID { cardId }
+
+    init(card: Card, quantity: Int = 1) {
+        self.cardId = card.id
+        self.cardName = card.name
+        self.quantity = quantity
+    }
+}
+
+// MARK: - Player Profile
+
 @Model
 final class PlayerProfile {
     var id: UUID
-    var username: String
-    var avatarName: String
-    var gold: Int
-    var gems: Int
-    var trophies: Int
-    var level: Int
-    var experience: Int
-    var gamesPlayed: Int
-    var gamesWon: Int
+    var displayName: String
+    var totalWins: Int
+    var totalLosses: Int
+    var currency: Int
+    var hasRemovedAds: Bool
     var createdAt: Date
 
-    @Relationship(deleteRule: .cascade)
-    var decks: [Deck]
+    // Card collection stored as Codable array with quantities
+    var cardCollection: [OwnedCardEntry]
 
     @Relationship(deleteRule: .cascade)
-    var cardCollection: [Card]
+    var unlockedChampions: [Champion]
+
+    @Relationship(deleteRule: .cascade)
+    var savedDecks: [Deck]
 
     init(
-        username: String = "Raider",
-        avatarName: String = "avatar_default",
-        gold: Int = 500,
-        gems: Int = 50,
-        trophies: Int = 0,
-        level: Int = 1,
-        experience: Int = 0
+        displayName: String = "Raider",
+        currency: Int = 500
     ) {
         self.id = UUID()
-        self.username = username
-        self.avatarName = avatarName
-        self.gold = gold
-        self.gems = gems
-        self.trophies = trophies
-        self.level = level
-        self.experience = experience
-        self.gamesPlayed = 0
-        self.gamesWon = 0
+        self.displayName = displayName
+        self.totalWins = 0
+        self.totalLosses = 0
+        self.currency = currency
+        self.hasRemovedAds = false
         self.createdAt = Date()
-        self.decks = []
         self.cardCollection = []
+        self.unlockedChampions = []
+        self.savedDecks = []
+    }
+
+    // MARK: - Computed Properties
+
+    var totalGames: Int {
+        totalWins + totalLosses
     }
 
     var winRate: Double {
-        guard gamesPlayed > 0 else { return 0 }
-        return Double(gamesWon) / Double(gamesPlayed)
+        guard totalGames > 0 else { return 0 }
+        return Double(totalWins) / Double(totalGames)
+    }
+
+    // MARK: - Collection Management
+
+    func addCard(_ card: Card, quantity: Int = 1) {
+        if let index = cardCollection.firstIndex(where: { $0.cardId == card.id }) {
+            cardCollection[index].quantity += quantity
+        } else {
+            cardCollection.append(OwnedCardEntry(card: card, quantity: quantity))
+        }
+    }
+
+    func removeCard(_ card: Card, quantity: Int = 1) {
+        guard let index = cardCollection.firstIndex(where: { $0.cardId == card.id }) else { return }
+        cardCollection[index].quantity -= quantity
+        if cardCollection[index].quantity <= 0 {
+            cardCollection.remove(at: index)
+        }
+    }
+
+    func quantityOwned(of card: Card) -> Int {
+        cardCollection.first(where: { $0.cardId == card.id })?.quantity ?? 0
+    }
+
+    var uniqueCardsOwned: Int {
+        cardCollection.count
+    }
+
+    var totalCardsOwned: Int {
+        cardCollection.reduce(0) { $0 + $1.quantity }
     }
 }
