@@ -34,6 +34,13 @@
 		A10000010000000000000041 /* StarterDataLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000041; };
 		A10000010000000000000042 /* arena_raiders_starter_data.json in Resources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000042; };
 		A10000010000000000000050 /* ModelValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000050; };
+		A10000010000000000000051 /* EnumsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000051; };
+		A10000010000000000000052 /* GameEffectHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000052; };
+		A10000010000000000000053 /* CardReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000053; };
+		A10000010000000000000054 /* ActiveGearMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000054; };
+		A10000010000000000000055 /* GameSessionStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000055; };
+		A10000010000000000000056 /* PlayerProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000056; };
+		A10000010000000000000057 /* StarterDataLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000057; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,6 +73,13 @@
 		A20000010000000000000041 /* StarterDataLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarterDataLoader.swift; sourceTree = "<group>"; };
 		A20000010000000000000042 /* arena_raiders_starter_data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = arena_raiders_starter_data.json; sourceTree = "<group>"; };
 		A20000010000000000000050 /* ModelValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelValidationTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000051 /* EnumsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumsTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000052 /* GameEffectHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameEffectHandlerTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000053 /* CardReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardReferenceTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000054 /* ActiveGearMapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveGearMapTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000055 /* GameSessionStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSessionStateTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000056 /* PlayerProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerProfileTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000057 /* StarterDataLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarterDataLoaderTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +115,13 @@
 				A20000010000000000000030 /* GameEngineTests.swift */,
 				A20000010000000000000031 /* AIOpponentTests.swift */,
 				A20000010000000000000050 /* ModelValidationTests.swift */,
+				A20000010000000000000051 /* EnumsTests.swift */,
+				A20000010000000000000052 /* GameEffectHandlerTests.swift */,
+				A20000010000000000000053 /* CardReferenceTests.swift */,
+				A20000010000000000000054 /* ActiveGearMapTests.swift */,
+				A20000010000000000000055 /* GameSessionStateTests.swift */,
+				A20000010000000000000056 /* PlayerProfileTests.swift */,
+				A20000010000000000000057 /* StarterDataLoaderTests.swift */,
 			);
 			path = ArenaRaidersTests;
 			sourceTree = "<group>";
@@ -335,6 +356,13 @@
 				A10000010000000000000030 /* GameEngineTests.swift in Sources */,
 				A10000010000000000000031 /* AIOpponentTests.swift in Sources */,
 				A10000010000000000000050 /* ModelValidationTests.swift in Sources */,
+				A10000010000000000000051 /* EnumsTests.swift in Sources */,
+				A10000010000000000000052 /* GameEffectHandlerTests.swift in Sources */,
+				A10000010000000000000053 /* CardReferenceTests.swift in Sources */,
+				A10000010000000000000054 /* ActiveGearMapTests.swift in Sources */,
+				A10000010000000000000055 /* GameSessionStateTests.swift in Sources */,
+				A10000010000000000000056 /* PlayerProfileTests.swift in Sources */,
+				A10000010000000000000057 /* StarterDataLoaderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
