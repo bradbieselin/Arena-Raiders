@@ -26,8 +26,6 @@ struct InnatePassive: Codable, Equatable, Hashable {
 
 @Model
 final class Champion {
-    #Unique<Champion>([\.stringId])
-
     var id: UUID
     var stringId: String
     var name: String

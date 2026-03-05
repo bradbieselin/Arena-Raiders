@@ -3,8 +3,6 @@ import SwiftData
 
 @Model
 final class Card {
-    #Unique<Card>([\.stringId])
-
     var id: UUID
     var stringId: String
     var name: String
