@@ -169,10 +169,10 @@ final class CardReferenceTests: XCTestCase {
             hp: 35,
             avoidance: 10,
             mitigation: 3,
-            innatePassive: InnatePassive(name: "Unyielding", description: "Reduce damage by 1"),
+            innatePassive: InnatePassive(name: "Unyielding", effectDescription: "Reduce damage by 1"),
             tierEffects: [
-                TierEffect(tier: 1, name: "Battle-Forged", description: "+5 Attack"),
-                TierEffect(tier: 2, name: "Warlord's Resolve", description: "Roll 2 D20s")
+                TierEffect(tier: 1, name: "Battle-Forged", effectDescription: "+5 Attack"),
+                TierEffect(tier: 2, name: "Warlord's Resolve", effectDescription: "Roll 2 D20s")
             ],
             rarity: .rare
         )
@@ -198,7 +198,7 @@ final class CardReferenceTests: XCTestCase {
             hp: 25,
             avoidance: 14,
             mitigation: 1,
-            innatePassive: InnatePassive(name: "Arcane Surge", description: "Crit +1 res"),
+            innatePassive: InnatePassive(name: "Arcane Surge", effectDescription: "Crit +1 res"),
             tierEffects: []
         )
         let ref = ChampionReference(champion: champion)

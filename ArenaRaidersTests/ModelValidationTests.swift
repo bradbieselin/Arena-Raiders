@@ -13,10 +13,10 @@ final class ModelValidationTests: XCTestCase {
         hp: Int = 30,
         avoidance: Int = 12,
         mitigation: Int = 2,
-        innatePassive: InnatePassive = InnatePassive(name: "Test Passive", description: "A test passive"),
+        innatePassive: InnatePassive = InnatePassive(name: "Test Passive", effectDescription: "A test passive"),
         tierEffects: [TierEffect] = [
-            TierEffect(tier: 1, name: "Tier1", description: "First tier"),
-            TierEffect(tier: 2, name: "Tier2", description: "Second tier")
+            TierEffect(tier: 1, name: "Tier1", effectDescription: "First tier"),
+            TierEffect(tier: 2, name: "Tier2", effectDescription: "Second tier")
         ],
         rarity: Rarity = .rare,
         flavorText: String = "A mighty warrior."
@@ -83,10 +83,10 @@ final class ModelValidationTests: XCTestCase {
     // MARK: - Champion Tests
 
     func testChampionCreatedWithAllRequiredFields() {
-        let innate = InnatePassive(name: "Iron Will", description: "Reduces damage by 1")
+        let innate = InnatePassive(name: "Iron Will", effectDescription: "Reduces damage by 1")
         let tiers = [
-            TierEffect(tier: 1, name: "Shield Bash", description: "+2 mitigation"),
-            TierEffect(tier: 2, name: "Fortify", description: "+4 mitigation")
+            TierEffect(tier: 1, name: "Shield Bash", effectDescription: "+2 mitigation"),
+            TierEffect(tier: 2, name: "Fortify", effectDescription: "+4 mitigation")
         ]
         let champion = Champion(
             stringId: "vex_ironclad",
@@ -108,7 +108,7 @@ final class ModelValidationTests: XCTestCase {
         XCTAssertEqual(champion.avoidance, 10)
         XCTAssertEqual(champion.mitigation, 3)
         XCTAssertEqual(champion.innatePassive.name, "Iron Will")
-        XCTAssertEqual(champion.innatePassive.description, "Reduces damage by 1")
+        XCTAssertEqual(champion.innatePassive.effectDescription, "Reduces damage by 1")
         XCTAssertEqual(champion.tierEffects.count, 2)
         XCTAssertEqual(champion.tierEffect(for: 1)?.name, "Shield Bash")
         XCTAssertEqual(champion.tierEffect(for: 2)?.name, "Fortify")

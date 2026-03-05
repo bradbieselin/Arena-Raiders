@@ -38,7 +38,7 @@ final class AIOpponentTests: XCTestCase {
             hp: 30,
             avoidance: 12,
             mitigation: 3,
-            innatePassive: InnatePassive(name: "AI Passive", description: "AI passive desc"),
+            innatePassive: InnatePassive(name: "AI Passive", effectDescription: "AI passive desc"),
             tierEffects: []
         ))
 

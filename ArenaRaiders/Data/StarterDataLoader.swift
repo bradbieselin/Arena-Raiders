@@ -33,13 +33,23 @@ struct ChampionJSON: Decodable {
 
 struct InnatePassiveJSON: Decodable {
     let name: String
-    let description: String
+    let effectDescription: String
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case effectDescription = "description"
+    }
 }
 
 struct TierEffectJSON: Decodable {
     let tier: Int
     let name: String
-    let description: String
+    let effectDescription: String
+
+    enum CodingKeys: String, CodingKey {
+        case tier, name
+        case effectDescription = "description"
+    }
 }
 
 struct CardJSON: Decodable {
@@ -111,10 +121,10 @@ struct StarterDataLoader {
                 mitigation: cJSON.mitigation,
                 innatePassive: InnatePassive(
                     name: cJSON.innatePassive.name,
-                    description: cJSON.innatePassive.description
+                    effectDescription: cJSON.innatePassive.effectDescription
                 ),
                 tierEffects: cJSON.tierEffects.map {
-                    TierEffect(tier: $0.tier, name: $0.name, description: $0.description)
+                    TierEffect(tier: $0.tier, name: $0.name, effectDescription: $0.effectDescription)
                 },
                 rarity: Rarity(rawValue: cJSON.rarity) ?? .common,
                 flavorText: cJSON.flavorText

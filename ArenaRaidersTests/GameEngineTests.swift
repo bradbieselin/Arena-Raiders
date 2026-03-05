@@ -40,10 +40,10 @@ final class GameEngineTests: XCTestCase {
             hp: 30,
             avoidance: 12,
             mitigation: 3,
-            innatePassive: InnatePassive(name: "Test Passive", description: "Test passive desc"),
+            innatePassive: InnatePassive(name: "Test Passive", effectDescription: "Test passive desc"),
             tierEffects: [
-                TierEffect(tier: 1, name: "Tier 1 Bonus", description: "Tier 1 desc"),
-                TierEffect(tier: 2, name: "Tier 2 Bonus", description: "Tier 2 desc")
+                TierEffect(tier: 1, name: "Tier 1 Bonus", effectDescription: "Tier 1 desc"),
+                TierEffect(tier: 2, name: "Tier 2 Bonus", effectDescription: "Tier 2 desc")
             ]
         ))
     }
@@ -56,7 +56,7 @@ final class GameEngineTests: XCTestCase {
             hp: 30,
             avoidance: 12,
             mitigation: 3,
-            innatePassive: InnatePassive(name: "Test Passive", description: "Test desc"),
+            innatePassive: InnatePassive(name: "Test Passive", effectDescription: "Test desc"),
             tierEffects: []
         )
         let session = GameSession(phase: .raid, champion: champion)

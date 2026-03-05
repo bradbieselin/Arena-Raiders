@@ -13,10 +13,10 @@ final class GameSessionStateTests: XCTestCase {
             hp: hp,
             avoidance: 12,
             mitigation: 3,
-            innatePassive: InnatePassive(name: "Test Passive", description: "desc"),
+            innatePassive: InnatePassive(name: "Test Passive", effectDescription: "desc"),
             tierEffects: [
-                TierEffect(tier: 1, name: "T1", description: "d1"),
-                TierEffect(tier: 2, name: "T2", description: "d2"),
+                TierEffect(tier: 1, name: "T1", effectDescription: "d1"),
+                TierEffect(tier: 2, name: "T2", effectDescription: "d2"),
             ]
         )
     }

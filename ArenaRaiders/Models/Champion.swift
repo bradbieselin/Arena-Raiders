@@ -6,12 +6,17 @@ import SwiftData
 struct TierEffect: Codable, Equatable, Hashable {
     let tier: Int
     let name: String
-    let description: String
+    let effectDescription: String
 
-    init(tier: Int, name: String, description: String) {
+    enum CodingKeys: String, CodingKey {
+        case tier, name
+        case effectDescription = "description"
+    }
+
+    init(tier: Int, name: String, effectDescription: String) {
         self.tier = tier
         self.name = name
-        self.description = description
+        self.effectDescription = effectDescription
     }
 }
 
@@ -19,7 +24,12 @@ struct TierEffect: Codable, Equatable, Hashable {
 
 struct InnatePassive: Codable, Equatable, Hashable {
     let name: String
-    let description: String
+    let effectDescription: String
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case effectDescription = "description"
+    }
 }
 
 // MARK: - Champion

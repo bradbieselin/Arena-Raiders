@@ -188,7 +188,7 @@ final class PlayerProfileTests: XCTestCase {
             hp: 35,
             avoidance: 10,
             mitigation: 3,
-            innatePassive: InnatePassive(name: "Unyielding", description: "desc")
+            innatePassive: InnatePassive(name: "Unyielding", effectDescription: "desc")
         )
         context.insert(champion)
         profile.unlockedChampions.append(champion)
