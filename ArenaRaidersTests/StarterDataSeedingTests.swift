@@ -260,9 +260,15 @@ final class StarterDataSeedingTests: XCTestCase {
         }
     }
 
-    func testSeedLogicStartingCurrency() {
-        // Verify the seed creates a profile with currency 100
+    func testSeedLogicStartingCurrency() throws {
+        // Verify PlayerProfile defaults when created with currency 100
+        let container = try ModelContainer(
+            for: PlayerProfile.self, Champion.self, Card.self, Deck.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let context = container.mainContext
         let profile = PlayerProfile(currency: 100)
+        context.insert(profile)
         XCTAssertEqual(profile.currency, 100)
         XCTAssertFalse(profile.hasRemovedAds)
         XCTAssertFalse(profile.hasCompletedFirstLaunch)
