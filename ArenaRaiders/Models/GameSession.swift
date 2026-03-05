@@ -11,7 +11,11 @@ struct ActiveGearMap: Codable, Equatable {
     }
 
     mutating func equip(_ card: Card, in slot: GearSlot) {
-        if let encoded = try? JSONEncoder().encode(CardReference(card: card)) {
+        equipRef(CardReference(card: card), in: slot)
+    }
+
+    mutating func equipRef(_ ref: CardReference, in slot: GearSlot) {
+        if let encoded = try? JSONEncoder().encode(ref) {
             slots[slot.rawValue] = encoded
         }
     }
@@ -29,6 +33,10 @@ struct ActiveGearMap: Codable, Equatable {
         slots.keys.compactMap { GearSlot(rawValue: $0) }
     }
 
+    var allEquippedCards: [CardReference] {
+        equippedSlots.compactMap { card(in: $0) }
+    }
+
     var isEmpty: Bool {
         slots.isEmpty
     }
@@ -42,7 +50,7 @@ struct CardReference: Codable, Equatable, Hashable, Identifiable {
     let cardType: CardType
     let gearSlot: GearSlot?
     let resourceCost: Int
-    let durability: Int?
+    var durability: Int?
     let effectDescription: String
     let rarity: Rarity
     let isInstant: Bool
