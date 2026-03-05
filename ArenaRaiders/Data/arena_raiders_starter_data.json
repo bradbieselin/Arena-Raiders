@@ -873,31 +873,58 @@
     "requiredChampion": true,
     "gearSlotLimit": "One active card per slot at a time (Head, Chest, Hands, Feet, Weapon). Deck can contain multiples as redundancy."
   },
-  "starterDeckSuggestion": {
-    "name": "Iron Path",
-    "champion": "champ_001",
-    "cardList": [
-      {"id": "card_001", "qty": 2},
-      {"id": "card_006", "qty": 2},
-      {"id": "card_010", "qty": 2},
-      {"id": "card_014", "qty": 2},
-      {"id": "card_018", "qty": 2},
-      {"id": "card_022", "qty": 2},
-      {"id": "card_023", "qty": 2},
-      {"id": "card_024", "qty": 2},
-      {"id": "card_025", "qty": 2},
-      {"id": "card_034", "qty": 2},
-      {"id": "card_035", "qty": 2},
-      {"id": "card_036", "qty": 2},
-      {"id": "card_037", "qty": 2},
-      {"id": "card_038", "qty": 2},
-      {"id": "card_039", "qty": 2},
-      {"id": "card_040", "qty": 2},
-      {"id": "card_041", "qty": 2},
-      {"id": "card_053", "qty": 2},
-      {"id": "card_054", "qty": 2},
-      {"id": "card_044", "qty": 2}
-    ],
-    "note": "A balanced beginner deck for Vex the Ironclad. Solid economy, reliable damage, basic disruption."
-  }
+  "starterDecks": [
+    {
+      "name": "Iron & Blood",
+      "champion": "champ_001",
+      "cardList": [
+        {"id": "card_001", "qty": 2},
+        {"id": "card_006", "qty": 2},
+        {"id": "card_010", "qty": 2},
+        {"id": "card_014", "qty": 2},
+        {"id": "card_018", "qty": 2},
+        {"id": "card_022", "qty": 2},
+        {"id": "card_023", "qty": 2},
+        {"id": "card_024", "qty": 2},
+        {"id": "card_025", "qty": 2},
+        {"id": "card_034", "qty": 2},
+        {"id": "card_035", "qty": 2},
+        {"id": "card_036", "qty": 2},
+        {"id": "card_037", "qty": 2},
+        {"id": "card_038", "qty": 2},
+        {"id": "card_039", "qty": 2},
+        {"id": "card_040", "qty": 2},
+        {"id": "card_041", "qty": 2},
+        {"id": "card_053", "qty": 2},
+        {"id": "card_054", "qty": 2},
+        {"id": "card_044", "qty": 2}
+      ]
+    },
+    {
+      "name": "Cut and Run",
+      "champion": "champ_002",
+      "cardList": [
+        {"id": "card_003", "qty": 2},
+        {"id": "card_006", "qty": 2},
+        {"id": "card_012", "qty": 2},
+        {"id": "card_015", "qty": 2},
+        {"id": "card_020", "qty": 2},
+        {"id": "card_024", "qty": 2},
+        {"id": "card_026", "qty": 2},
+        {"id": "card_029", "qty": 2},
+        {"id": "card_030", "qty": 2},
+        {"id": "card_037", "qty": 2},
+        {"id": "card_038", "qty": 2},
+        {"id": "card_039", "qty": 2},
+        {"id": "card_042", "qty": 2},
+        {"id": "card_043", "qty": 2},
+        {"id": "card_045", "qty": 2},
+        {"id": "card_047", "qty": 2},
+        {"id": "card_049", "qty": 2},
+        {"id": "card_053", "qty": 2},
+        {"id": "card_055", "qty": 2},
+        {"id": "card_058", "qty": 2}
+      ]
+    }
+  ]
 }

@@ -59,14 +59,16 @@ final class StarterDataLoaderTests: XCTestCase {
                     "flavorText": "Hit hard."
                 }
             ],
-            "starterDeckSuggestion": {
-                "name": "Iron Path",
-                "champion": "champ_001",
-                "cardList": [
-                    { "id": "card_001", "qty": 2 },
-                    { "id": "card_034", "qty": 2 }
-                ]
-            }
+            "starterDecks": [
+                {
+                    "name": "Iron Path",
+                    "champion": "champ_001",
+                    "cardList": [
+                        { "id": "card_001", "qty": 2 },
+                        { "id": "card_034", "qty": 2 }
+                    ]
+                }
+            ]
         }
         """.data(using: .utf8)!
 
@@ -109,12 +111,13 @@ final class StarterDataLoaderTests: XCTestCase {
         XCTAssertNil(abilityCard.durability)
         XCTAssertEqual(abilityCard.isInstant, false)
 
-        // Starter Deck
-        XCTAssertEqual(starterData.starterDeckSuggestion.name, "Iron Path")
-        XCTAssertEqual(starterData.starterDeckSuggestion.champion, "champ_001")
-        XCTAssertEqual(starterData.starterDeckSuggestion.cardList.count, 2)
-        XCTAssertEqual(starterData.starterDeckSuggestion.cardList[0].id, "card_001")
-        XCTAssertEqual(starterData.starterDeckSuggestion.cardList[0].qty, 2)
+        // Starter Decks
+        XCTAssertEqual(starterData.starterDecks.count, 1)
+        XCTAssertEqual(starterData.starterDecks[0].name, "Iron Path")
+        XCTAssertEqual(starterData.starterDecks[0].champion, "champ_001")
+        XCTAssertEqual(starterData.starterDecks[0].cardList.count, 2)
+        XCTAssertEqual(starterData.starterDecks[0].cardList[0].id, "card_001")
+        XCTAssertEqual(starterData.starterDecks[0].cardList[0].qty, 2)
     }
 
     func testChampionJSONOptionalFields() throws {

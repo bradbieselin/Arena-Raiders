@@ -7,7 +7,7 @@ struct StarterData: Decodable {
     let meta: MetaInfo
     let champions: [ChampionJSON]
     let cards: [CardJSON]
-    let starterDeckSuggestion: StarterDeckJSON
+    let starterDecks: [StarterDeckJSON]
 }
 
 struct MetaInfo: Decodable {
@@ -98,18 +98,18 @@ struct StarterDataLoader {
         }
     }
 
-    /// Seeds all champions, cards, starter deck, and player profile into the given context.
-    /// Only runs if no champions exist yet (first launch).
+    /// Seeds all champions, cards, starter decks, and player profile into the given context.
+    /// Only runs if no PlayerProfile exists yet (first launch).
     @MainActor
     static func seedIfNeeded(context: ModelContext) {
-        // Check if data already seeded
-        let championDescriptor = FetchDescriptor<Champion>()
-        let existingChampions = (try? context.fetch(championDescriptor)) ?? []
-        guard existingChampions.isEmpty else { return }
+        // Check if profile already exists (already seeded)
+        let profileDescriptor = FetchDescriptor<PlayerProfile>()
+        let existingProfiles = (try? context.fetch(profileDescriptor)) ?? []
+        guard existingProfiles.isEmpty else { return }
 
         guard let starterData = loadJSON() else { return }
 
-        // Seed champions
+        // Seed all 6 champions
         var championMap: [String: Champion] = [:]
         for cJSON in starterData.champions {
             let champion = Champion(
@@ -133,7 +133,7 @@ struct StarterDataLoader {
             championMap[cJSON.id] = champion
         }
 
-        // Seed cards
+        // Seed all 60 cards
         var cardMap: [String: Card] = [:]
         for cardJSON in starterData.cards {
             let card = Card(
@@ -155,32 +155,24 @@ struct StarterDataLoader {
             cardMap[cardJSON.id] = card
         }
 
-        // Ensure player profile exists
-        let profileDescriptor = FetchDescriptor<PlayerProfile>()
-        let existingProfiles = (try? context.fetch(profileDescriptor)) ?? []
-        let profile: PlayerProfile
-        if let existing = existingProfiles.first {
-            profile = existing
-        } else {
-            profile = PlayerProfile()
-            context.insert(profile)
+        // Create player profile with starting currency of 100
+        let profile = PlayerProfile(currency: 100)
+        context.insert(profile)
+
+        // Unlock all 6 champions
+        for champion in championMap.values {
+            profile.unlockedChampions.append(champion)
         }
 
-        // Give player the first champion (Vex) unlocked
-        if let vex = championMap["champ_001"] {
-            profile.unlockedChampions.append(vex)
+        // Add all 60 cards to player's card collection (1 copy each)
+        for card in cardMap.values {
+            profile.addCard(card, quantity: 1)
         }
 
-        // Give player 2 copies of each starter deck card
-        let starterDeck = starterData.starterDeckSuggestion
-        for entry in starterDeck.cardList {
-            if let card = cardMap[entry.id] {
-                profile.addCard(card, quantity: entry.qty)
-            }
-        }
+        // Build both starter decks
+        for starterDeck in starterData.starterDecks {
+            guard let deckChampion = championMap[starterDeck.champion] else { continue }
 
-        // Build the starter deck
-        if let deckChampion = championMap[starterDeck.champion] {
             var deckCards: [Card] = []
             for entry in starterDeck.cardList {
                 if let card = cardMap[entry.id] {
@@ -203,7 +195,7 @@ struct StarterDataLoader {
 
         do {
             try context.save()
-            print("StarterDataLoader: Seeded \(championMap.count) champions, \(cardMap.count) cards, and starter deck")
+            print("StarterDataLoader: Seeded \(championMap.count) champions, \(cardMap.count) cards, and \(starterData.starterDecks.count) starter decks")
         } catch {
             print("StarterDataLoader: Failed to save seeded data: \(error)")
         }
