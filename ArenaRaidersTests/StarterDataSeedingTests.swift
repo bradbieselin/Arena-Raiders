@@ -216,16 +216,22 @@ final class StarterDataSeedingTests: XCTestCase {
     // MARK: - seedIfNeeded Integration Tests
 
     @MainActor
-    func testSeedIfNeededCreatesProfileWithCorrectCurrency() throws {
+    private func makeSeededContext() throws -> ModelContext {
         let container = try ModelContainer(
             for: PlayerProfile.self, Champion.self, Card.self, Deck.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         let context = container.mainContext
+        context.autosaveEnabled = false
 
-        // Manually seed since we have the JSON
         let starterData = try loadStarterDataFromTestBundle()
         seedFromData(starterData, context: context)
+        return context
+    }
+
+    @MainActor
+    func testSeedIfNeededCreatesProfileWithCorrectCurrency() throws {
+        let context = try makeSeededContext()
 
         let profiles = try context.fetch(FetchDescriptor<PlayerProfile>())
         XCTAssertEqual(profiles.count, 1, "Should create exactly one PlayerProfile")
@@ -238,14 +244,7 @@ final class StarterDataSeedingTests: XCTestCase {
 
     @MainActor
     func testSeedIfNeededUnlocksAllSixChampions() throws {
-        let container = try ModelContainer(
-            for: PlayerProfile.self, Champion.self, Card.self, Deck.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-        )
-        let context = container.mainContext
-
-        let starterData = try loadStarterDataFromTestBundle()
-        seedFromData(starterData, context: context)
+        let context = try makeSeededContext()
 
         let profiles = try context.fetch(FetchDescriptor<PlayerProfile>())
         let profile = profiles[0]
@@ -258,14 +257,7 @@ final class StarterDataSeedingTests: XCTestCase {
 
     @MainActor
     func testSeedIfNeededAddsAll60CardsToPool() throws {
-        let container = try ModelContainer(
-            for: PlayerProfile.self, Champion.self, Card.self, Deck.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-        )
-        let context = container.mainContext
-
-        let starterData = try loadStarterDataFromTestBundle()
-        seedFromData(starterData, context: context)
+        let context = try makeSeededContext()
 
         let cards = try context.fetch(FetchDescriptor<Card>())
         XCTAssertEqual(cards.count, 60, "Should have 60 cards in context")
@@ -278,14 +270,7 @@ final class StarterDataSeedingTests: XCTestCase {
 
     @MainActor
     func testSeedIfNeededCreatesBothStarterDecks() throws {
-        let container = try ModelContainer(
-            for: PlayerProfile.self, Champion.self, Card.self, Deck.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-        )
-        let context = container.mainContext
-
-        let starterData = try loadStarterDataFromTestBundle()
-        seedFromData(starterData, context: context)
+        let context = try makeSeededContext()
 
         let profiles = try context.fetch(FetchDescriptor<PlayerProfile>())
         let profile = profiles[0]
@@ -310,6 +295,7 @@ final class StarterDataSeedingTests: XCTestCase {
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         let context = container.mainContext
+        context.autosaveEnabled = false
 
         let starterData = try loadStarterDataFromTestBundle()
         seedFromData(starterData, context: context)
@@ -412,6 +398,5 @@ final class StarterDataSeedingTests: XCTestCase {
         profile.savedDecks = decks
 
         profile.hasCompletedFirstLaunch = true
-        try? context.save()
     }
 }
