@@ -10,7 +10,6 @@ final class TreasureChest {
     static let maxChestsPerGame = 3
 
     init(integrity: Int, tier: Int) {
-        precondition(tier >= 1 && tier <= 3, "Chest tier must be 1, 2, or 3")
         self.id = UUID()
         self.integrity = integrity
         self.tier = tier

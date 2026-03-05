@@ -72,7 +72,6 @@ struct FixedDiceProvider: DiceProvider {
 
 final class GameEngine {
     private let dice: DiceProvider
-    static let defaultHandSize = 5
 
     init(dice: DiceProvider = RandomDiceProvider()) {
         self.dice = dice
@@ -84,75 +83,257 @@ final class GameEngine {
         dice.rollD20()
     }
 
-    func classifyRoll(_ roll: Int) -> RollResult {
+    /// Rolls with advantage (2 D20s, pick highest)
+    func rollWithAdvantage() -> Int {
+        max(dice.rollD20(), dice.rollD20())
+    }
+
+    /// Rolls with disadvantage (2 D20s, pick lowest)
+    func rollWithDisadvantage() -> Int {
+        min(dice.rollD20(), dice.rollD20())
+    }
+
+    func classifyRoll(_ roll: Int, session: GameSession? = nil) -> RollResult {
+        // Check for Lucky Strike talent (19 counts as Crit)
+        let hasLuckyStrike = session?.activeTalents.contains { $0.stringId == "card_024" } ?? false
+
         switch roll {
         case 1...9: return .miss(roll: roll)
-        case 10...19: return .hit(roll: roll)
+        case 10...18: return .hit(roll: roll)
+        case 19: return hasLuckyStrike ? .crit : .hit(roll: roll)
         case 20: return .crit
         default: return .miss(roll: roll)
         }
     }
 
+    // MARK: - Attack Modifier Calculation
+
+    func computeAttackModifiers(session: GameSession) -> Int {
+        var bonus = 0
+
+        // Weapon attack bonus
+        if let weapon = session.activeGear.card(in: .weapon),
+           let effect = GameEffectHandler.forCard(weapon.stringId) {
+            bonus += effect.attackBonus
+        }
+
+        // Tier effect attack bonuses
+        if let champ = session.playerChampion {
+            for te in champ.tierEffects {
+                if let handler = GameEffectHandler.forChampionTier(champ.stringId, tier: te.tier) {
+                    bonus += handler.attackBonus
+                }
+            }
+
+            // Blood Rage: +2 Attack per 5 HP below max
+            if GameEffectHandler.forChampionInnate(champ.stringId) == .innateBloodRage {
+                let hpLost = session.playerMaxHP - session.playerHP
+                bonus += (hpLost / 5) * 2
+            }
+        }
+
+        // Apex Predator: +1 per equipped gear (max +5)
+        if session.activeTalents.contains(where: { $0.stringId == "card_033" }) {
+            bonus += min(5, session.activeGear.equippedCount)
+        }
+
+        return bonus
+    }
+
+    func computeAvoidanceModifiers(session: GameSession) -> Int {
+        var bonus = 0
+        for card in session.activeGear.allEquippedCards {
+            if let effect = GameEffectHandler.forCard(card.stringId) {
+                bonus += effect.avoidanceBonus
+            }
+        }
+        return bonus
+    }
+
+    func computeMitigationModifiers(session: GameSession) -> Int {
+        var bonus = 0
+        for card in session.activeGear.allEquippedCards {
+            if let effect = GameEffectHandler.forCard(card.stringId) {
+                bonus += effect.mitigationBonus
+            }
+        }
+        return bonus
+    }
+
+    // MARK: - Resource Calculation
+
+    func computePassiveResourceIncome(session: GameSession) -> Int {
+        var income = 0
+        for card in session.activeGear.allEquippedCards {
+            if let effect = GameEffectHandler.forCard(card.stringId) {
+                income += effect.resourcePerTurn
+            }
+        }
+        return income
+    }
+
     // MARK: - Raid Phase
 
-    func resolveChestRoll(roll: Int, chest: TreasureChest) -> ChestRollOutcome {
-        let result = classifyRoll(roll)
+    func resolveChestRoll(roll: Int, chest: TreasureChest, session: GameSession? = nil) -> ChestRollOutcome {
+        let result = classifyRoll(roll, session: session)
+        var resources: Int
 
         switch result {
         case .miss:
-            return ChestRollOutcome(roll: roll, result: result, damage: 0, resources: 1)
+            resources = 1
+            // Overclock: +1 resource from every roll
+            if session?.activeTalents.contains(where: { $0.stringId == "card_031" }) == true {
+                resources += 1
+            }
+            return ChestRollOutcome(roll: roll, result: result, damage: 0, resources: resources)
 
         case .hit(let rollValue):
-            let damage = chest.takeDamage(rollValue)
-            return ChestRollOutcome(roll: roll, result: result, damage: damage, resources: 3)
+            let attackMods = session.map { computeAttackModifiers(session: $0) } ?? 0
+            let totalDamage = rollValue + attackMods
+            let damage = chest.takeDamage(totalDamage)
+            resources = 3
+            if session?.activeTalents.contains(where: { $0.stringId == "card_031" }) == true {
+                resources += 1
+            }
+            return ChestRollOutcome(roll: roll, result: result, damage: damage, resources: resources)
 
         case .crit:
-            let doubleDamage = 20 * 2
-            let damage = chest.takeDamage(doubleDamage)
-            return ChestRollOutcome(roll: roll, result: result, damage: damage, resources: 5)
-        }
-    }
-
-    func applyPassiveIncome(gear: [CardReference]) -> Int {
-        gear.reduce(0) { total, card in
-            guard card.cardType == .gear else { return total }
-            // Each equipped gear provides 1 passive resource per turn
-            total + 1
+            let attackMods = session.map { computeAttackModifiers(session: $0) } ?? 0
+            let totalDamage = (20 + attackMods) * 2
+            let damage = chest.takeDamage(totalDamage)
+            resources = 5
+            if session?.activeTalents.contains(where: { $0.stringId == "card_031" }) == true {
+                resources += 1
+            }
+            // Arcane Surge: +1 resource on Crit
+            if let champ = session?.playerChampion,
+               GameEffectHandler.forChampionInnate(champ.stringId) == .innateArcaneSurge {
+                resources += 1
+            }
+            // Plunderer's Gauntlets: +3 bonus on Crit
+            if let hands = session?.activeGear.card(in: .hands),
+               GameEffectHandler.forCard(hands.stringId) == .handsResource2CritBonus3 {
+                resources += 3
+            }
+            return ChestRollOutcome(roll: roll, result: result, damage: damage, resources: resources)
         }
     }
 
     func discardForResource(card: CardReference, session: inout GameSession) -> Int {
         if let index = session.playerHand.firstIndex(where: { $0.id == card.id }) {
-            session.playerHand.remove(at: index)
+            let discarded = session.playerHand.remove(at: index)
+            session.playerDiscard.append(discarded)
+        }
+        // Scavenger talent: +2 instead of +1
+        if session.activeTalents.contains(where: { $0.stringId == "card_025" }) {
+            return 2
         }
         return 1
     }
 
     func playCard(card: CardReference, session: inout GameSession) {
-        guard session.playerResources >= card.resourceCost else { return }
+        var effectiveCost = card.resourceCost
+
+        // Overcharge (Aldric T1): Abilities cost 1 less
+        if card.isAbility,
+           let champ = session.playerChampion,
+           GameEffectHandler.forChampionTier(champ.stringId, tier: 1) == .tier1Overcharge {
+            effectiveCost = max(1, effectiveCost - 1)
+        }
+
+        // Entropy Blade (Zara T1): Sabotage costs 0
+        if card.isSabotage,
+           let champ = session.playerChampion,
+           GameEffectHandler.forChampionTier(champ.stringId, tier: 1) == .tier1EntropyBlade {
+            effectiveCost = 0
+        }
+
+        guard session.playerResources >= effectiveCost else { return }
         guard let handIndex = session.playerHand.firstIndex(where: { $0.id == card.id }) else { return }
 
-        session.playerResources -= card.resourceCost
+        session.playerResources -= effectiveCost
         session.playerHand.remove(at: handIndex)
 
         switch card.cardType {
         case .gear:
             if let slot = card.gearSlot {
-                session.activeGear.equipRef(card, in: slot)
+                // Check Shatterproof talent: +1 max durability
+                var equipped = card
+                if session.activeTalents.contains(where: { $0.stringId == "card_032" }),
+                   let dur = equipped.durability {
+                    equipped.durability = dur + 1
+                }
+                session.activeGear.equipRef(equipped, in: slot)
             }
 
         case .talent:
             session.activeTalents.append(card)
+            // Apply immediate talent effects
+            if let effect = GameEffectHandler.forCard(card.stringId) {
+                applyTalentEffect(effect, session: &session)
+            }
+            // Divine Verdict (Seraphine T1): heal 3 on talent play
+            if let champ = session.playerChampion,
+               GameEffectHandler.forChampionTier(champ.stringId, tier: 1) == .tier1DivineVerdict {
+                session.playerHP = min(session.playerMaxHP, session.playerHP + 3)
+            }
 
         case .ability:
-            // Abilities have immediate effects and are consumed
-            // Effect resolution is handled by the caller based on effectDescription
-            break
+            applyAbilityEffect(card, session: &session)
+            session.playerDiscard.append(card)
 
         case .adventure:
-            // Adventure cards modify the raid scenario
-            // Effect resolution is handled by the caller based on effectDescription
+            session.activeAdventures.append(ActiveAdventure(card: card))
+        }
+    }
+
+    private func applyTalentEffect(_ effect: GameEffectHandler, session: inout GameSession) {
+        switch effect {
+        case .talentToughness:
+            session.playerMaxHP += 3
+            session.playerHP += 3
+        case .talentQuickHands:
+            session.handSizeBonus += 1
+        default:
+            break // Passive effects are checked during gameplay
+        }
+    }
+
+    private func applyAbilityEffect(_ card: CardReference, session: inout GameSession) {
+        guard let effect = GameEffectHandler.forCard(card.stringId) else { return }
+
+        switch effect {
+        case .abilityPowerStrike:
+            // 6 direct damage — applied to chest or opponent by caller
             break
+        case .abilityBandage:
+            session.playerHP = min(session.playerMaxHP, session.playerHP + 4)
+        case .abilityBattleCry:
+            session.playerResources += 3
+            drawCard(deck: &session.playerDeck, hand: &session.playerHand,
+                     handSize: session.effectiveHandSize)
+        case .abilitySecondWind:
+            if session.playerHP < session.playerMaxHP / 2 {
+                session.playerHP = min(session.playerMaxHP, session.playerHP + 8)
+            }
+        case .abilityQuickPatch:
+            // Restore 1 durability to a gear card — target chosen by caller
+            break
+        case .abilityFullRepair:
+            for slot in session.activeGear.equippedSlots {
+                if var gear = session.activeGear.card(in: slot) {
+                    gear.durability = gear.maxDurability
+                    session.activeGear.equipRef(gear, in: slot)
+                }
+            }
+        case .abilityPoisonFlask:
+            session.opponentStatusEffects.append(
+                StatusEffect(type: .poison, turnsRemaining: 3, damagePerTurn: 3)
+            )
+        case .abilityPerfectDodge:
+            session.perfectDodgeUsed = true
+        default:
+            break // Other abilities resolved by caller
         }
     }
 
@@ -171,7 +352,8 @@ final class GameEngine {
         attackerRoll: Int,
         attackerModifiers: Int,
         defenderAC: Int,
-        defenderMG: Int
+        defenderMG: Int,
+        ignoreMitigation: Bool = false
     ) -> AttackOutcome {
         let totalAttack = attackerRoll + attackerModifiers
         let didHit = totalAttack >= defenderAC
@@ -187,7 +369,8 @@ final class GameEngine {
         }
 
         let rawDamage = totalAttack
-        let mitigated = min(defenderMG, rawDamage)
+        let effectiveMG = ignoreMitigation ? 0 : defenderMG
+        let mitigated = min(effectiveMG, rawDamage)
         let finalDamage = max(0, rawDamage - mitigated)
 
         return AttackOutcome(
@@ -209,7 +392,12 @@ final class GameEngine {
         guard var card = session.activeGear.card(in: slot) else { return }
         applyDurabilityLoss(card: &card, amount: amount)
         if card.durability == 0 {
+            // Warlord's Warhelm: deal 5 damage on break
+            if GameEffectHandler.forCard(card.stringId) == .headAvoidance3MG2OnBreak {
+                // Damage applied to opponent — tracked via return or callback
+            }
             session.activeGear.unequip(slot)
+            session.playerDiscard.append(card)
         } else {
             session.activeGear.equipRef(card, in: slot)
         }
@@ -219,12 +407,65 @@ final class GameEngine {
         hp <= 0
     }
 
+    // MARK: - Status Effects
+
+    func processStatusEffects(effects: inout [StatusEffect]) -> Int {
+        var totalDamage = 0
+        for i in (0..<effects.count).reversed() {
+            totalDamage += effects[i].damagePerTurn
+            effects[i].turnsRemaining -= 1
+            if effects[i].isExpired {
+                effects.remove(at: i)
+            }
+        }
+        return totalDamage
+    }
+
+    // MARK: - Adventures
+
+    func tickAdventures(session: inout GameSession) {
+        for i in (0..<session.activeAdventures.count).reversed() {
+            session.activeAdventures[i].turnsRemaining -= 1
+
+            // Per-turn adventure effects
+            if let effect = GameEffectHandler.forCard(session.activeAdventures[i].card.stringId) {
+                if effect == .adventureLootRun {
+                    session.playerResources += 1
+                }
+            }
+
+            if session.activeAdventures[i].isComplete {
+                let adventure = session.activeAdventures.remove(at: i)
+                resolveCompletedAdventure(adventure, session: &session)
+            }
+        }
+    }
+
+    private func resolveCompletedAdventure(_ adventure: ActiveAdventure, session: inout GameSession) {
+        guard let effect = GameEffectHandler.forCard(adventure.card.stringId) else { return }
+
+        switch effect {
+        case .adventureLootRun:
+            drawCards(count: 2, deck: &session.playerDeck, hand: &session.playerHand,
+                      handSize: session.effectiveHandSize)
+        case .adventureBountyHunt:
+            session.playerResources += adventure.hitsDuringAdventure * 2
+        case .adventureFieldMedicine:
+            session.playerHP = min(session.playerMaxHP, session.playerHP + 10)
+        case .adventureTheFinalRaid:
+            // 20 damage to opponent + heal 5 — opponent damage tracked by caller
+            session.playerHP = min(session.playerMaxHP, session.playerHP + 5)
+        default:
+            break // Other adventures resolved by caller (scoutAhead, supplyRun, etc.)
+        }
+    }
+
     // MARK: - General
 
     func drawCard(
         deck: inout [CardReference],
         hand: inout [CardReference],
-        handSize: Int = defaultHandSize
+        handSize: Int = GameSession.defaultHandSize
     ) {
         guard hand.count < handSize, !deck.isEmpty else { return }
         let drawn = deck.removeFirst()
@@ -235,7 +476,7 @@ final class GameEngine {
         count: Int,
         deck: inout [CardReference],
         hand: inout [CardReference],
-        handSize: Int = defaultHandSize
+        handSize: Int = GameSession.defaultHandSize
     ) {
         for _ in 0..<count {
             guard hand.count < handSize, !deck.isEmpty else { break }
@@ -249,13 +490,57 @@ final class GameEngine {
     }
 
     func endTurn(session: inout GameSession) {
-        session.playerResources = 0
+        // Tick adventures
+        tickAdventures(session: &session)
+
+        // Process status effects on player
+        let statusDamage = processStatusEffects(effects: &session.playerStatusEffects)
+        session.playerHP -= statusDamage
+
+        // Clear resources (unless Goldweave Mitts carry-over)
+        if !session.goldweaveMittsUsed,
+           session.activeGear.card(in: .hands).flatMap({ GameEffectHandler.forCard($0.stringId) }) == .handsResource3CarryOver,
+           session.playerResources > 0 {
+            let carryOver = min(3, session.playerResources)
+            session.playerResources = carryOver
+            session.goldweaveMittsUsed = true
+        } else {
+            session.playerResources = 0
+        }
+
+        session.currentTurn += 1
 
         // Draw a card for next turn
         drawCard(
             deck: &session.playerDeck,
-            hand: &session.playerHand
+            hand: &session.playerHand,
+            handSize: session.effectiveHandSize
         )
+
+        // Crown of Clarity: draw 1 extra
+        if let head = session.activeGear.card(in: .head),
+           GameEffectHandler.forCard(head.stringId) == .headAvoidance2DrawExtra {
+            drawCard(deck: &session.playerDeck, hand: &session.playerHand,
+                     handSize: session.effectiveHandSize + 1) // bonus draw ignores hand size
+        }
+
+        // Holy Mending: heal 1 at start of raid turn
+        if session.phase == .raid,
+           let champ = session.playerChampion,
+           GameEffectHandler.forChampionInnate(champ.stringId) == .innateHolyMending {
+            session.playerHP = min(session.playerMaxHP, session.playerHP + 1)
+        }
+
+        // Aegis Plate: heal 2 at start of arena turn
+        if session.phase == .arena,
+           let chest = session.activeGear.card(in: .chest),
+           GameEffectHandler.forCard(chest.stringId) == .chestMG4AV1Heal2 {
+            session.playerHP = min(session.playerMaxHP, session.playerHP + 2)
+        }
+
+        // Add passive resource income
+        session.playerResources += computePassiveResourceIncome(session: session)
+        session.playerResources += GameSession.startingResources
     }
 
     // MARK: - Session Setup
@@ -265,7 +550,7 @@ final class GameEngine {
 
         // Draw opening hand
         drawCards(
-            count: GameEngine.defaultHandSize,
+            count: GameSession.defaultHandSize,
             deck: &session.playerDeck,
             hand: &session.playerHand
         )
@@ -287,7 +572,6 @@ final class GameEngine {
     func advanceChest(session: inout GameSession) {
         session.chestCount += 1
         guard session.chestCount < GameSession.maxChests else {
-            // All chests defeated — transition to arena
             session.phase = .arena
             return
         }

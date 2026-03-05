@@ -12,7 +12,7 @@ struct ArenaRaidersApp: App {
                 .environment(appState)
                 .modelContainer(dataManager.modelContainer)
                 .task {
-                    dataManager.ensurePlayerProfileExists()
+                    dataManager.seedOnFirstLaunch()
                 }
         }
     }

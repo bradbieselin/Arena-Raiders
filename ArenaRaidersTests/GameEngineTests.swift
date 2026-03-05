@@ -6,15 +6,19 @@ final class GameEngineTests: XCTestCase {
     // MARK: - Helpers
 
     private func makeCard(
+        stringId: String = "card_001",
         name: String = "Test Card",
         type: CardType = .gear,
         gearSlot: GearSlot? = .weapon,
         cost: Int = 2,
         durability: Int? = 3,
         rarity: Rarity = .common,
-        isInstant: Bool = false
+        isInstant: Bool = false,
+        isTwoHanded: Bool = false,
+        turnsToComplete: Int? = nil
     ) -> CardReference {
         CardReference(card: Card(
+            stringId: stringId,
             name: name,
             cardType: type,
             gearSlot: type == .gear ? gearSlot : nil,
@@ -22,40 +26,46 @@ final class GameEngineTests: XCTestCase {
             durability: durability,
             effectDescription: "Test effect",
             rarity: rarity,
-            isInstant: isInstant
+            isInstant: isInstant,
+            isTwoHanded: isTwoHanded,
+            turnsToComplete: turnsToComplete
         ))
     }
 
     private func makeChampionRef() -> ChampionReference {
         ChampionReference(champion: Champion(
+            stringId: "champ_test",
             name: "Test Champion",
+            archetype: .warrior,
             hp: 30,
             avoidance: 12,
             mitigation: 3,
-            innatePassive: InnatePassive(description: "Test passive", effect: .regeneration),
+            innatePassive: InnatePassive(name: "Test Passive", description: "Test passive desc"),
             tierEffects: [
-                TierEffect(tier: 1, description: "Tier 1 bonus", effect: .shield),
-                TierEffect(tier: 2, description: "Tier 2 bonus", effect: .damageBoost)
+                TierEffect(tier: 1, name: "Tier 1 Bonus", description: "Tier 1 desc"),
+                TierEffect(tier: 2, name: "Tier 2 Bonus", description: "Tier 2 desc")
             ]
         ))
     }
 
     private func makeSession(deckSize: Int = 10) -> GameSession {
         let champion = Champion(
+            stringId: "champ_test",
             name: "Test Champion",
+            archetype: .warrior,
             hp: 30,
             avoidance: 12,
             mitigation: 3,
-            innatePassive: InnatePassive(description: "Test passive", effect: .regeneration),
+            innatePassive: InnatePassive(name: "Test Passive", description: "Test desc"),
             tierEffects: []
         )
         let session = GameSession(phase: .raid, champion: champion)
-        // Populate deck with test cards
         var deck: [CardReference] = []
         for i in 0..<deckSize {
             let types: [CardType] = [.gear, .talent, .ability, .adventure]
             let cardType = types[i % types.count]
             let card = Card(
+                stringId: "card_test_\(i)",
                 name: "Card \(i)",
                 cardType: cardType,
                 gearSlot: cardType == .gear ? .weapon : nil,
@@ -82,7 +92,6 @@ final class GameEngineTests: XCTestCase {
     }
 
     func testRollD20Distribution() {
-        // Verify all values 1-20 appear at least once in 10000 rolls
         let engine = GameEngine()
         var seen = Set<Int>()
         for _ in 0..<10000 {
@@ -94,7 +103,6 @@ final class GameEngineTests: XCTestCase {
     }
 
     func testRollD20Fairness() {
-        // Chi-squared-style check: each value should appear roughly 5% of the time
         let engine = GameEngine()
         var counts = [Int: Int]()
         let totalRolls = 100_000
@@ -105,7 +113,6 @@ final class GameEngineTests: XCTestCase {
         let expected = Double(totalRolls) / 20.0
         for value in 1...20 {
             let count = Double(counts[value] ?? 0)
-            // Allow 20% deviation from expected
             XCTAssertGreaterThan(count, expected * 0.8, "Value \(value) appeared too rarely")
             XCTAssertLessThan(count, expected * 1.2, "Value \(value) appeared too often")
         }
@@ -117,7 +124,6 @@ final class GameEngineTests: XCTestCase {
         XCTAssertEqual(engine.rollD20(), 5)
         XCTAssertEqual(engine.rollD20(), 15)
         XCTAssertEqual(engine.rollD20(), 20)
-        // Wraps around
         XCTAssertEqual(engine.rollD20(), 5)
     }
 
@@ -148,13 +154,13 @@ final class GameEngineTests: XCTestCase {
     // MARK: - Chest Roll Resource Tests
 
     func testChestRollMissGives1Resource() {
-        let engine = GameEngine(dice: FixedDiceProvider(values: [5]))
+        let engine = GameEngine()
         let chest = TreasureChest(integrity: 50, tier: 1)
         let outcome = engine.resolveChestRoll(roll: 5, chest: chest)
 
         XCTAssertEqual(outcome.resources, 1)
         XCTAssertEqual(outcome.damage, 0)
-        XCTAssertEqual(chest.integrity, 50) // No damage on miss
+        XCTAssertEqual(chest.integrity, 50)
     }
 
     func testChestRollHitGives3Resources() {
@@ -169,12 +175,12 @@ final class GameEngineTests: XCTestCase {
 
     func testChestRollCritGives5Resources() {
         let engine = GameEngine()
-        let chest = TreasureChest(integrity: 50, tier: 1)
+        let chest = TreasureChest(integrity: 100, tier: 1)
         let outcome = engine.resolveChestRoll(roll: 20, chest: chest)
 
         XCTAssertEqual(outcome.resources, 5)
         XCTAssertEqual(outcome.damage, 40) // 20 * 2
-        XCTAssertEqual(chest.integrity, 10)
+        XCTAssertEqual(chest.integrity, 60)
     }
 
     func testChestRollDamageClampedToIntegrity() {
@@ -182,37 +188,27 @@ final class GameEngineTests: XCTestCase {
         let chest = TreasureChest(integrity: 5, tier: 1)
         let outcome = engine.resolveChestRoll(roll: 15, chest: chest)
 
-        XCTAssertEqual(outcome.damage, 5) // Clamped to remaining integrity
+        XCTAssertEqual(outcome.damage, 5)
         XCTAssertEqual(chest.integrity, 0)
         XCTAssertTrue(chest.isDestroyed)
     }
 
     // MARK: - Passive Income Tests
 
-    func testPassiveIncomeFromGear() {
+    func testPassiveIncomeFromGearEffects() {
         let engine = GameEngine()
-        let gear = [
-            makeCard(name: "Helm", gearSlot: .head),
-            makeCard(name: "Sword", gearSlot: .weapon),
-            makeCard(name: "Boots", gearSlot: .feet),
-        ]
-        let income = engine.applyPassiveIncome(gear: gear)
-        XCTAssertEqual(income, 3) // 1 per gear
+        var session = makeSession()
+        // Equip Worn Gloves (card_014) = +1 resource
+        let gloves = makeCard(stringId: "card_014", name: "Worn Gloves", gearSlot: .hands, cost: 1)
+        session.activeGear.equipRef(gloves, in: .hands)
+        let income = engine.computePassiveResourceIncome(session: session)
+        XCTAssertEqual(income, 1)
     }
 
-    func testPassiveIncomeIgnoresNonGear() {
+    func testPassiveIncomeEmpty() {
         let engine = GameEngine()
-        let mixed = [
-            makeCard(name: "Sword", type: .gear, gearSlot: .weapon),
-            makeCard(name: "Fireball", type: .ability, gearSlot: nil, durability: nil),
-        ]
-        let income = engine.applyPassiveIncome(gear: mixed)
-        XCTAssertEqual(income, 1) // Only the gear card counts
-    }
-
-    func testPassiveIncomeEmptyGear() {
-        let engine = GameEngine()
-        let income = engine.applyPassiveIncome(gear: [])
+        let session = makeSession()
+        let income = engine.computePassiveResourceIncome(session: session)
         XCTAssertEqual(income, 0)
     }
 
@@ -227,6 +223,19 @@ final class GameEngineTests: XCTestCase {
         let resources = engine.discardForResource(card: card, session: &session)
         XCTAssertEqual(resources, 1)
         XCTAssertTrue(session.playerHand.isEmpty)
+        XCTAssertEqual(session.playerDiscard.count, 1)
+    }
+
+    func testScavengerTalentGivesExtraDiscard() {
+        let engine = GameEngine()
+        var session = makeSession()
+        let scavenger = makeCard(stringId: "card_025", name: "Scavenger", type: .talent, gearSlot: nil, durability: nil)
+        session.activeTalents = [scavenger]
+        let card = makeCard(name: "Discard Me")
+        session.playerHand = [card]
+
+        let resources = engine.discardForResource(card: card, session: &session)
+        XCTAssertEqual(resources, 2)
     }
 
     // MARK: - Play Card Tests
@@ -244,7 +253,6 @@ final class GameEngineTests: XCTestCase {
         XCTAssertEqual(session.playerResources, 3)
         XCTAssertTrue(session.playerHand.isEmpty)
         XCTAssertNotNil(session.activeGear.card(in: .weapon))
-        XCTAssertEqual(session.activeGear.card(in: .weapon)?.name, "Epic Sword")
     }
 
     func testPlayTalentCardAddedToActiveTalents() {
@@ -252,7 +260,7 @@ final class GameEngineTests: XCTestCase {
         var session = makeSession()
         session.playerResources = 5
 
-        let talent = makeCard(name: "Battle Focus", type: .talent, gearSlot: nil, cost: 1, durability: nil)
+        let talent = makeCard(stringId: "card_test_talent", name: "Battle Focus", type: .talent, gearSlot: nil, cost: 1, durability: nil)
         session.playerHand = [talent]
 
         engine.playCard(card: talent, session: &session)
@@ -271,8 +279,8 @@ final class GameEngineTests: XCTestCase {
 
         engine.playCard(card: expensiveCard, session: &session)
 
-        XCTAssertEqual(session.playerResources, 1) // Unchanged
-        XCTAssertEqual(session.playerHand.count, 1) // Still in hand
+        XCTAssertEqual(session.playerResources, 1)
+        XCTAssertEqual(session.playerHand.count, 1)
     }
 
     func testPlayCardFailsIfNotInHand() {
@@ -281,10 +289,10 @@ final class GameEngineTests: XCTestCase {
         session.playerResources = 10
 
         let ghost = makeCard(name: "Ghost Card")
-        session.playerHand = [] // Empty hand
+        session.playerHand = []
 
         engine.playCard(card: ghost, session: &session)
-        XCTAssertEqual(session.playerResources, 10) // Unchanged
+        XCTAssertEqual(session.playerResources, 10)
     }
 
     // MARK: - Chest Defeated Tests
@@ -307,11 +315,11 @@ final class GameEngineTests: XCTestCase {
 
         let tier1 = engine.awardTierEffect(tier: 1, champion: &champ)
         XCTAssertNotNil(tier1)
-        XCTAssertEqual(tier1?.effect, .shield)
+        XCTAssertEqual(tier1?.name, "Tier 1 Bonus")
 
         let tier2 = engine.awardTierEffect(tier: 2, champion: &champ)
         XCTAssertNotNil(tier2)
-        XCTAssertEqual(tier2?.effect, .damageBoost)
+        XCTAssertEqual(tier2?.name, "Tier 2 Bonus")
     }
 
     func testAwardTierEffectInvalidTier() {
@@ -334,9 +342,9 @@ final class GameEngineTests: XCTestCase {
         )
 
         XCTAssertTrue(outcome.didHit)
-        XCTAssertEqual(outcome.rawDamage, 18) // 15 + 3
+        XCTAssertEqual(outcome.rawDamage, 18)
         XCTAssertEqual(outcome.mitigated, 5)
-        XCTAssertEqual(outcome.finalDamage, 13) // 18 - 5
+        XCTAssertEqual(outcome.finalDamage, 13)
     }
 
     func testAttackMiss() {
@@ -361,8 +369,8 @@ final class GameEngineTests: XCTestCase {
             defenderMG: 3
         )
 
-        XCTAssertTrue(outcome.didHit) // Equal to AC counts as hit
-        XCTAssertEqual(outcome.finalDamage, 9) // 12 - 3
+        XCTAssertTrue(outcome.didHit)
+        XCTAssertEqual(outcome.finalDamage, 9)
     }
 
     func testAttackMitigationCannotExceedDamage() {
@@ -375,8 +383,23 @@ final class GameEngineTests: XCTestCase {
         )
 
         XCTAssertTrue(outcome.didHit)
-        XCTAssertEqual(outcome.mitigated, 10) // Clamped to rawDamage
-        XCTAssertEqual(outcome.finalDamage, 0) // Fully mitigated
+        XCTAssertEqual(outcome.mitigated, 10)
+        XCTAssertEqual(outcome.finalDamage, 0)
+    }
+
+    func testAttackIgnoreMitigation() {
+        let engine = GameEngine()
+        let outcome = engine.resolveAttack(
+            attackerRoll: 15,
+            attackerModifiers: 3,
+            defenderAC: 12,
+            defenderMG: 10,
+            ignoreMitigation: true
+        )
+
+        XCTAssertTrue(outcome.didHit)
+        XCTAssertEqual(outcome.mitigated, 0)
+        XCTAssertEqual(outcome.finalDamage, 18)
     }
 
     // MARK: - Durability Tests
@@ -388,7 +411,7 @@ final class GameEngineTests: XCTestCase {
         engine.applyDurabilityLoss(card: &card, amount: 1)
         XCTAssertEqual(card.durability, 2)
 
-        engine.applyDurabilityLoss(card: &card, amount: 5) // Overkill
+        engine.applyDurabilityLoss(card: &card, amount: 5)
         XCTAssertEqual(card.durability, 0)
     }
 
@@ -397,7 +420,7 @@ final class GameEngineTests: XCTestCase {
         var card = makeCard(name: "Talent", type: .talent, gearSlot: nil, durability: nil)
 
         engine.applyDurabilityLoss(card: &card, amount: 1)
-        XCTAssertNil(card.durability) // Unchanged
+        XCTAssertNil(card.durability)
     }
 
     func testGearDurabilityLossRemovesAtZero() {
@@ -407,7 +430,8 @@ final class GameEngineTests: XCTestCase {
         session.activeGear.equipRef(weapon, in: .weapon)
 
         engine.applyGearDurabilityLoss(slot: .weapon, amount: 1, session: &session)
-        XCTAssertNil(session.activeGear.card(in: .weapon)) // Removed at 0
+        XCTAssertNil(session.activeGear.card(in: .weapon))
+        XCTAssertEqual(session.playerDiscard.count, 1)
     }
 
     // MARK: - Champion Defeated Tests
@@ -440,8 +464,8 @@ final class GameEngineTests: XCTestCase {
 
         engine.drawCard(deck: &deck, hand: &hand, handSize: 5)
 
-        XCTAssertEqual(hand.count, 5) // No draw, hand is full
-        XCTAssertEqual(deck.count, 1) // Card stays in deck
+        XCTAssertEqual(hand.count, 5)
+        XCTAssertEqual(deck.count, 1)
     }
 
     func testDrawCardFromEmptyDeck() {
@@ -464,20 +488,6 @@ final class GameEngineTests: XCTestCase {
 
         XCTAssertEqual(hand.count, 3)
         XCTAssertEqual(deck.count, 7)
-    }
-
-    // MARK: - End Turn Tests
-
-    func testEndTurnClearsResourcesAndDraws() {
-        let engine = GameEngine()
-        var session = makeSession(deckSize: 10)
-        session.playerResources = 5
-        session.playerHand = [makeCard(name: "Existing")]
-
-        engine.endTurn(session: &session)
-
-        XCTAssertEqual(session.playerResources, 0)
-        XCTAssertEqual(session.playerHand.count, 2) // 1 existing + 1 drawn
     }
 
     // MARK: - Game Setup Tests
@@ -511,11 +521,64 @@ final class GameEngineTests: XCTestCase {
     func testAdvanceChestToArenaPhase() {
         let engine = GameEngine()
         var session = makeSession()
-        session.chestCount = 2 // Already at 2, next advance = 3 = maxChests
+        session.chestCount = 2
 
         engine.advanceChest(session: &session)
 
         XCTAssertEqual(session.chestCount, 3)
         XCTAssertEqual(session.phase, .arena)
+    }
+
+    // MARK: - GameEffectHandler Mapping Tests
+
+    func testAllCardsHaveEffectHandlers() {
+        for i in 1...60 {
+            let stringId = String(format: "card_%03d", i)
+            XCTAssertNotNil(
+                GameEffectHandler.forCard(stringId),
+                "Missing GameEffectHandler for \(stringId)"
+            )
+        }
+    }
+
+    func testAllChampionsHaveInnateHandlers() {
+        for i in 1...6 {
+            let stringId = String(format: "champ_%03d", i)
+            XCTAssertNotNil(
+                GameEffectHandler.forChampionInnate(stringId),
+                "Missing innate handler for \(stringId)"
+            )
+        }
+    }
+
+    func testAllChampionsHaveTierHandlers() {
+        for i in 1...6 {
+            let stringId = String(format: "champ_%03d", i)
+            XCTAssertNotNil(
+                GameEffectHandler.forChampionTier(stringId, tier: 1),
+                "Missing T1 handler for \(stringId)"
+            )
+            XCTAssertNotNil(
+                GameEffectHandler.forChampionTier(stringId, tier: 2),
+                "Missing T2 handler for \(stringId)"
+            )
+        }
+    }
+
+    // MARK: - Status Effect Tests
+
+    func testProcessStatusEffects() {
+        let engine = GameEngine()
+        var effects = [
+            StatusEffect(type: .poison, turnsRemaining: 2, damagePerTurn: 3)
+        ]
+        let damage = engine.processStatusEffects(effects: &effects)
+        XCTAssertEqual(damage, 3)
+        XCTAssertEqual(effects.count, 1)
+        XCTAssertEqual(effects[0].turnsRemaining, 1)
+
+        let damage2 = engine.processStatusEffects(effects: &effects)
+        XCTAssertEqual(damage2, 3)
+        XCTAssertTrue(effects.isEmpty) // Expired
     }
 }

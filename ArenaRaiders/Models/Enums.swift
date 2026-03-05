@@ -3,10 +3,10 @@ import Foundation
 // MARK: - Rarity
 
 enum Rarity: String, Codable, CaseIterable, Comparable {
-    case common
-    case rare
-    case epic
-    case legendary
+    case common = "Common"
+    case rare = "Rare"
+    case epic = "Epic"
+    case legendary = "Legendary"
 
     private var sortOrder: Int {
         switch self {
@@ -21,75 +21,76 @@ enum Rarity: String, Codable, CaseIterable, Comparable {
         lhs.sortOrder < rhs.sortOrder
     }
 
-    var displayName: String {
-        rawValue.capitalized
+    var displayName: String { rawValue }
+
+    /// Pack pull weight (percentage)
+    var pullWeight: Double {
+        switch self {
+        case .common: return 0.60
+        case .rare: return 0.25
+        case .epic: return 0.12
+        case .legendary: return 0.03
+        }
     }
 }
 
 // MARK: - Card Type
 
 enum CardType: String, Codable, CaseIterable {
-    case gear
-    case talent
-    case ability
-    case adventure
+    case gear = "Gear"
+    case talent = "Talent"
+    case ability = "Ability"
+    case adventure = "Adventure"
 
-    var displayName: String {
-        rawValue.capitalized
-    }
+    var displayName: String { rawValue }
+}
+
+// MARK: - Card Subtype
+
+enum CardSubtype: String, Codable, CaseIterable {
+    case sabotage = "Sabotage"
+
+    var displayName: String { rawValue }
 }
 
 // MARK: - Gear Slot
 
 enum GearSlot: String, Codable, CaseIterable {
-    case head
-    case chest
-    case hands
-    case feet
-    case weapon
+    case head = "Head"
+    case chest = "Chest"
+    case hands = "Hands"
+    case feet = "Feet"
+    case weapon = "Weapon"
 
-    var displayName: String {
-        rawValue.capitalized
-    }
+    var displayName: String { rawValue }
 }
 
-// MARK: - Passive Effect
+// MARK: - Champion Archetype
 
-enum PassiveEffect: String, Codable, CaseIterable {
-    case lifeSteal
-    case thorns
-    case regeneration
-    case shield
-    case haste
-    case fortify
-    case evasion
-    case resourceGain
-    case damageBoost
-    case drawExtra
+enum Archetype: String, Codable, CaseIterable {
+    case warrior = "Warrior"
+    case rogue = "Rogue"
+    case mage = "Mage"
+    case paladin = "Paladin"
+    case berserker = "Berserker"
+    case shadow = "Shadow"
 
-    var displayName: String {
-        switch self {
-        case .lifeSteal: return "Life Steal"
-        case .thorns: return "Thorns"
-        case .regeneration: return "Regeneration"
-        case .shield: return "Shield"
-        case .haste: return "Haste"
-        case .fortify: return "Fortify"
-        case .evasion: return "Evasion"
-        case .resourceGain: return "Resource Gain"
-        case .damageBoost: return "Damage Boost"
-        case .drawExtra: return "Draw Extra"
-        }
-    }
+    var displayName: String { rawValue }
 }
 
 // MARK: - Game Phase
 
 enum GamePhase: String, Codable, CaseIterable {
-    case raid
-    case arena
+    case raid = "Raid"
+    case arena = "Arena"
 
-    var displayName: String {
-        rawValue.capitalized
-    }
+    var displayName: String { rawValue }
+}
+
+// MARK: - Deck Building Rules
+
+enum DeckRules {
+    static let deckSize = 40
+    static let maxCopiesPerCard = 2
+    static let requiredChampion = true
 }

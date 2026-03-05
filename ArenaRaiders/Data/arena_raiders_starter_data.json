@@ -1,0 +1,903 @@
+{
+  "meta": {
+    "game": "Arena Raiders",
+    "version": "1.0",
+    "set": "Core Set",
+    "totalCards": 60,
+    "totalChampions": 6
+  },
+  "champions": [
+    {
+      "id": "champ_001",
+      "name": "Vex the Ironclad",
+      "archetype": "Warrior",
+      "hp": 30,
+      "avoidance": 12,
+      "mitigation": 3,
+      "innatePassive": {
+        "name": "Unyielding",
+        "description": "When you take damage, reduce it by 1 (in addition to your Mitigation). Stacks with MG."
+      },
+      "tierEffects": [
+        {
+          "tier": 1,
+          "name": "Battle Forged",
+          "description": "+5 Attack damage and gain 2 HP whenever you land a Hit on the Chest."
+        },
+        {
+          "tier": 2,
+          "name": "Warlord's Resolve",
+          "description": "Roll 2 D20s and pick the highest for every attack roll."
+        }
+      ],
+      "rarity": "Common",
+      "flavorText": "He has never lost a fight he did not start."
+    },
+    {
+      "id": "champ_002",
+      "name": "Lyra Swiftblade",
+      "archetype": "Rogue",
+      "hp": 24,
+      "avoidance": 16,
+      "mitigation": 1,
+      "innatePassive": {
+        "name": "First Blood",
+        "description": "The first Hit you land each game deals double damage. Once per game."
+      },
+      "tierEffects": [
+        {
+          "tier": 1,
+          "name": "Shadow Step",
+          "description": "+5 Attack and your first attack each Arena turn cannot be blocked (ignore opponent's Avoidance)."
+        },
+        {
+          "tier": 2,
+          "name": "Death Mark",
+          "description": "Any time you roll a 15 or higher, apply Bleed (opponent loses 2 HP at the start of their next turn)."
+        }
+      ],
+      "rarity": "Common",
+      "flavorText": "You will not see her coming. That is the point."
+    },
+    {
+      "id": "champ_003",
+      "name": "Aldric the Stormbringer",
+      "archetype": "Mage",
+      "hp": 22,
+      "avoidance": 11,
+      "mitigation": 0,
+      "innatePassive": {
+        "name": "Arcane Surge",
+        "description": "Whenever you Crit the Chest, gain +1 extra Resource this turn."
+      },
+      "tierEffects": [
+        {
+          "tier": 1,
+          "name": "Overcharge",
+          "description": "+5 Attack and Ability cards cost 1 less Resource (minimum 1)."
+        },
+        {
+          "tier": 2,
+          "name": "Chain Lightning",
+          "description": "On a Crit in the Arena, deal splash damage equal to half the roll (rounded down) that bypasses Mitigation."
+        }
+      ],
+      "rarity": "Rare",
+      "flavorText": "He does not control the storm. He is the storm."
+    },
+    {
+      "id": "champ_004",
+      "name": "Seraphine the Blessed",
+      "archetype": "Paladin",
+      "hp": 28,
+      "avoidance": 13,
+      "mitigation": 2,
+      "innatePassive": {
+        "name": "Holy Mending",
+        "description": "At the start of each Raid turn, heal 1 HP."
+      },
+      "tierEffects": [
+        {
+          "tier": 1,
+          "name": "Divine Verdict",
+          "description": "+5 Attack and Heal 3 HP whenever you play a Talent card."
+        },
+        {
+          "tier": 2,
+          "name": "Aura of Wrath",
+          "description": "Opponent loses 2 HP at the start of every Arena turn (passive aura, no roll required)."
+        }
+      ],
+      "rarity": "Rare",
+      "flavorText": "Her god answers every prayer. Not always favorably."
+    },
+    {
+      "id": "champ_005",
+      "name": "Grizzak the Unbroken",
+      "archetype": "Berserker",
+      "hp": 35,
+      "avoidance": 9,
+      "mitigation": 0,
+      "innatePassive": {
+        "name": "Blood Rage",
+        "description": "+2 Attack for every 5 HP you are below your maximum. Scales as you take damage."
+      },
+      "tierEffects": [
+        {
+          "tier": 1,
+          "name": "Rampage",
+          "description": "+5 Attack. If you kill the Chest in one hit, take another turn immediately."
+        },
+        {
+          "tier": 2,
+          "name": "Unstoppable",
+          "description": "Roll 2 D20s and pick the highest for every roll. Also immune to Disadvantage effects."
+        }
+      ],
+      "rarity": "Epic",
+      "flavorText": "Pain is just his warm-up."
+    },
+    {
+      "id": "champ_006",
+      "name": "Zara the Voidwalker",
+      "archetype": "Shadow",
+      "hp": 25,
+      "avoidance": 14,
+      "mitigation": 1,
+      "innatePassive": {
+        "name": "Void Siphon",
+        "description": "Whenever the opponent plays a card, gain 1 Resource."
+      },
+      "tierEffects": [
+        {
+          "tier": 1,
+          "name": "Entropy Blade",
+          "description": "+5 Attack and your Sabotage cards cost 0 Resources."
+        },
+        {
+          "tier": 2,
+          "name": "Nullfield",
+          "description": "Once per Arena turn, you may cancel one Instant card played by the opponent (no cost)."
+        }
+      ],
+      "rarity": "Legendary",
+      "flavorText": "She does not steal your power. She erases it."
+    }
+  ],
+  "cards": [
+    {
+      "id": "card_001",
+      "name": "Iron Shortsword",
+      "type": "Gear",
+      "gearSlot": "Weapon",
+      "resourceCost": 2,
+      "durability": 4,
+      "rarity": "Common",
+      "effect": "Weapon: +3 Attack on all rolls.",
+      "flavorText": "Cheap. Reliable. Gets the job done."
+    },
+    {
+      "id": "card_002",
+      "name": "Reinforced Crossbow",
+      "type": "Gear",
+      "gearSlot": "Weapon",
+      "resourceCost": 3,
+      "durability": 3,
+      "rarity": "Common",
+      "effect": "Weapon: +4 Attack. On a Crit, deal +5 bonus damage.",
+      "flavorText": "Slow to load. Worth the wait."
+    },
+    {
+      "id": "card_003",
+      "name": "Serpent Fang Dagger",
+      "type": "Gear",
+      "gearSlot": "Weapon",
+      "resourceCost": 4,
+      "durability": 3,
+      "rarity": "Rare",
+      "effect": "Weapon: +4 Attack. Hits apply Poison (opponent loses 1 HP per turn for 3 turns) in the Arena.",
+      "flavorText": "The wound is not what kills you."
+    },
+    {
+      "id": "card_004",
+      "name": "Stormcaller Staff",
+      "type": "Gear",
+      "gearSlot": "Weapon",
+      "resourceCost": 5,
+      "durability": 3,
+      "rarity": "Epic",
+      "effect": "Weapon: +5 Attack. On a Crit, deal damage to your opponent AND reduce their Mitigation by 2 until end of their next turn.",
+      "flavorText": "The sky obeys no one. Until now."
+    },
+    {
+      "id": "card_005",
+      "name": "Voidbreaker Greatsword",
+      "type": "Gear",
+      "gearSlot": "Weapon",
+      "resourceCost": 7,
+      "durability": 4,
+      "rarity": "Legendary",
+      "isTwoHanded": true,
+      "effect": "Two-Handed Weapon (blocks Off-hand slot): +8 Attack. Attacks ignore Mitigation. On a Crit, the opponent discards a random card from their hand.",
+      "flavorText": "There is no armor it cannot find its way through."
+    },
+    {
+      "id": "card_006",
+      "name": "Leather Cap",
+      "type": "Gear",
+      "gearSlot": "Head",
+      "resourceCost": 1,
+      "durability": 3,
+      "rarity": "Common",
+      "effect": "Head: +1 Avoidance.",
+      "flavorText": "Not glamorous. Still works."
+    },
+    {
+      "id": "card_007",
+      "name": "Steel Helm",
+      "type": "Gear",
+      "gearSlot": "Head",
+      "resourceCost": 3,
+      "durability": 4,
+      "rarity": "Common",
+      "effect": "Head: +2 Avoidance and +1 Mitigation.",
+      "flavorText": "The dent is from the last fight. He won."
+    },
+    {
+      "id": "card_008",
+      "name": "Crown of Clarity",
+      "type": "Gear",
+      "gearSlot": "Head",
+      "resourceCost": 4,
+      "durability": 3,
+      "rarity": "Rare",
+      "effect": "Head: +2 Avoidance. At the start of each turn, draw 1 extra card (does not count against hand size limit).",
+      "flavorText": "A clear mind sees the winning move first."
+    },
+    {
+      "id": "card_009",
+      "name": "Warlord's Warhelm",
+      "type": "Gear",
+      "gearSlot": "Head",
+      "resourceCost": 6,
+      "durability": 5,
+      "rarity": "Epic",
+      "effect": "Head: +3 Avoidance and +2 Mitigation. When this card loses its last Durability point, deal 5 damage to your opponent.",
+      "flavorText": "He wore it through nine battles. The tenth man never got close enough."
+    },
+    {
+      "id": "card_010",
+      "name": "Hide Vest",
+      "type": "Gear",
+      "gearSlot": "Chest",
+      "resourceCost": 2,
+      "durability": 3,
+      "rarity": "Common",
+      "effect": "Chest: +2 Mitigation.",
+      "flavorText": "It smells. It works."
+    },
+    {
+      "id": "card_011",
+      "name": "Chainmail Hauberk",
+      "type": "Gear",
+      "gearSlot": "Chest",
+      "resourceCost": 3,
+      "durability": 4,
+      "rarity": "Common",
+      "effect": "Chest: +3 Mitigation.",
+      "flavorText": "Every link is a decision not to die today."
+    },
+    {
+      "id": "card_012",
+      "name": "Dragonscale Coat",
+      "type": "Gear",
+      "gearSlot": "Chest",
+      "resourceCost": 5,
+      "durability": 4,
+      "rarity": "Rare",
+      "effect": "Chest: +3 Mitigation. When you take 8 or more damage in one hit, this absorbs it and loses 1 Durability instead (once per hit).",
+      "flavorText": "The dragon did not give it willingly."
+    },
+    {
+      "id": "card_013",
+      "name": "Aegis Plate",
+      "type": "Gear",
+      "gearSlot": "Chest",
+      "resourceCost": 7,
+      "durability": 5,
+      "rarity": "Epic",
+      "effect": "Chest: +4 Mitigation and +1 Avoidance. At the start of your Arena turn, heal 2 HP.",
+      "flavorText": "Built for the last fight of the war. Worn into every fight since."
+    },
+    {
+      "id": "card_014",
+      "name": "Worn Gloves",
+      "type": "Gear",
+      "gearSlot": "Hands",
+      "resourceCost": 1,
+      "durability": 3,
+      "rarity": "Common",
+      "effect": "Hands: +1 Resource per turn.",
+      "flavorText": "More holes than leather. Still a bargain."
+    },
+    {
+      "id": "card_015",
+      "name": "Merchant's Grips",
+      "type": "Gear",
+      "gearSlot": "Hands",
+      "resourceCost": 2,
+      "durability": 3,
+      "rarity": "Common",
+      "effect": "Hands: +2 Resources per turn.",
+      "flavorText": "Every coin that passes through these gloves leaves a little behind."
+    },
+    {
+      "id": "card_016",
+      "name": "Plunderer's Gauntlets",
+      "type": "Gear",
+      "gearSlot": "Hands",
+      "resourceCost": 4,
+      "durability": 4,
+      "rarity": "Rare",
+      "effect": "Hands: +2 Resources per turn. When you land a Crit on the Chest, gain +3 bonus Resources that turn.",
+      "flavorText": "He takes everything that is not nailed down. And then the nails."
+    },
+    {
+      "id": "card_017",
+      "name": "Goldweave Mitts",
+      "type": "Gear",
+      "gearSlot": "Hands",
+      "resourceCost": 5,
+      "durability": 4,
+      "rarity": "Epic",
+      "effect": "Hands: +3 Resources per turn. Once per game, you may carry over up to 3 unspent Resources into your next turn.",
+      "flavorText": "Worth more than everything they will ever touch."
+    },
+    {
+      "id": "card_018",
+      "name": "Dusty Boots",
+      "type": "Gear",
+      "gearSlot": "Feet",
+      "resourceCost": 1,
+      "durability": 3,
+      "rarity": "Common",
+      "effect": "Feet: +1 Avoidance.",
+      "flavorText": "They have walked a thousand miles to this fight."
+    },
+    {
+      "id": "card_019",
+      "name": "Sprinter's Cleats",
+      "type": "Gear",
+      "gearSlot": "Feet",
+      "resourceCost": 2,
+      "durability": 3,
+      "rarity": "Common",
+      "effect": "Feet: +2 Avoidance. Once per Arena turn, you may re-roll a Miss (1-9) and keep the second result.",
+      "flavorText": "Fast enough to dodge the first mistake."
+    },
+    {
+      "id": "card_020",
+      "name": "Shadowstep Boots",
+      "type": "Gear",
+      "gearSlot": "Feet",
+      "resourceCost": 4,
+      "durability": 3,
+      "rarity": "Rare",
+      "effect": "Feet: +3 Avoidance. Your opponent's Sabotage Abilities that target your Champion have a 50% chance to miss (flip a coin on resolution).",
+      "flavorText": "She is never where they aim."
+    },
+    {
+      "id": "card_021",
+      "name": "Windrider Greaves",
+      "type": "Gear",
+      "gearSlot": "Feet",
+      "resourceCost": 5,
+      "durability": 4,
+      "rarity": "Epic",
+      "effect": "Feet: +3 Avoidance. You may play one Instant Ability each turn without spending Resources.",
+      "flavorText": "Move before they think. Strike before they breathe."
+    },
+    {
+      "id": "card_022",
+      "name": "Toughness",
+      "type": "Talent",
+      "gearSlot": null,
+      "resourceCost": 2,
+      "durability": null,
+      "rarity": "Common",
+      "effect": "Passive: Gain +3 Max HP permanently.",
+      "flavorText": "You do not get tougher by avoiding hits."
+    },
+    {
+      "id": "card_023",
+      "name": "Quick Hands",
+      "type": "Talent",
+      "gearSlot": null,
+      "resourceCost": 2,
+      "durability": null,
+      "rarity": "Common",
+      "effect": "Passive: Your hand size increases by 1.",
+      "flavorText": "More options. Fewer excuses."
+    },
+    {
+      "id": "card_024",
+      "name": "Lucky Strike",
+      "type": "Talent",
+      "gearSlot": null,
+      "resourceCost": 3,
+      "durability": null,
+      "rarity": "Common",
+      "effect": "Passive: Rolls of 19 also count as Crits.",
+      "flavorText": "Luck is just preparation meeting opportunity. A lot."
+    },
+    {
+      "id": "card_025",
+      "name": "Scavenger",
+      "type": "Talent",
+      "gearSlot": null,
+      "resourceCost": 2,
+      "durability": null,
+      "rarity": "Common",
+      "effect": "Passive: When you discard a card for Resources, gain +2 instead of +1.",
+      "flavorText": "One man's discard is another man's treasure."
+    },
+    {
+      "id": "card_026",
+      "name": "Iron Will",
+      "type": "Talent",
+      "gearSlot": null,
+      "resourceCost": 3,
+      "durability": null,
+      "rarity": "Rare",
+      "effect": "Passive: The first time you drop below 10 HP in a game, immediately gain +2 Mitigation and +2 Avoidance until end of that turn.",
+      "flavorText": "He does not break. He bends just enough to survive."
+    },
+    {
+      "id": "card_027",
+      "name": "Battle Rhythm",
+      "type": "Talent",
+      "gearSlot": null,
+      "resourceCost": 3,
+      "durability": null,
+      "rarity": "Rare",
+      "effect": "Passive: On your third consecutive turn of Hitting the Chest (not missing), gain +2 Resources that turn.",
+      "flavorText": "Momentum is a resource too."
+    },
+    {
+      "id": "card_028",
+      "name": "Vengeance",
+      "type": "Talent",
+      "gearSlot": null,
+      "resourceCost": 4,
+      "durability": null,
+      "rarity": "Rare",
+      "effect": "Passive: After taking damage in the Arena, your next attack gains +1 Attack for every 2 damage you took. Resets after each attack.",
+      "flavorText": "Every scar is an argument."
+    },
+    {
+      "id": "card_029",
+      "name": "Tactical Eye",
+      "type": "Talent",
+      "gearSlot": null,
+      "resourceCost": 4,
+      "durability": null,
+      "rarity": "Rare",
+      "effect": "Passive: Once per turn, you may look at the top card of your deck before deciding to draw.",
+      "flavorText": "Information is the first weapon."
+    },
+    {
+      "id": "card_030",
+      "name": "Lifesteal",
+      "type": "Talent",
+      "gearSlot": null,
+      "resourceCost": 5,
+      "durability": null,
+      "rarity": "Epic",
+      "effect": "Passive: Heal HP equal to 25% of the damage you deal in the Arena (rounded up).",
+      "flavorText": "He does not just take their fight. He takes their strength."
+    },
+    {
+      "id": "card_031",
+      "name": "Overclock",
+      "type": "Talent",
+      "gearSlot": null,
+      "resourceCost": 5,
+      "durability": null,
+      "rarity": "Epic",
+      "effect": "Passive: During the Raid Phase, gain +1 Resource from every roll result (stacks with Pity, Hit, and Crit bonuses).",
+      "flavorText": "More in. More out."
+    },
+    {
+      "id": "card_032",
+      "name": "Shatterproof",
+      "type": "Talent",
+      "gearSlot": null,
+      "resourceCost": 4,
+      "durability": null,
+      "rarity": "Rare",
+      "effect": "Passive: All your equipped Gear gains +1 Max Durability.",
+      "flavorText": "The best gear is gear that lasts."
+    },
+    {
+      "id": "card_033",
+      "name": "Apex Predator",
+      "type": "Talent",
+      "gearSlot": null,
+      "resourceCost": 7,
+      "durability": null,
+      "rarity": "Legendary",
+      "effect": "Passive: You deal +1 Attack for every piece of Gear currently equipped (each filled slot counts). Maximum +5.",
+      "flavorText": "Fully geared. Fully lethal."
+    },
+    {
+      "id": "card_034",
+      "name": "Power Strike",
+      "type": "Ability",
+      "gearSlot": null,
+      "resourceCost": 2,
+      "durability": null,
+      "isInstant": false,
+      "rarity": "Common",
+      "effect": "Deal 6 damage to the Chest or opponent Champion.",
+      "flavorText": "No finesse. Just force."
+    },
+    {
+      "id": "card_035",
+      "name": "Quick Patch",
+      "type": "Ability",
+      "gearSlot": null,
+      "resourceCost": 2,
+      "durability": null,
+      "isInstant": false,
+      "rarity": "Common",
+      "effect": "Restore 1 Durability to any equipped Gear card.",
+      "flavorText": "Duct tape and a prayer."
+    },
+    {
+      "id": "card_036",
+      "name": "Bandage",
+      "type": "Ability",
+      "gearSlot": null,
+      "resourceCost": 2,
+      "durability": null,
+      "isInstant": false,
+      "rarity": "Common",
+      "effect": "Heal 4 HP.",
+      "flavorText": "Not pretty. Gets you back in the fight."
+    },
+    {
+      "id": "card_037",
+      "name": "Focused Aim",
+      "type": "Ability",
+      "gearSlot": null,
+      "resourceCost": 3,
+      "durability": null,
+      "isInstant": false,
+      "rarity": "Common",
+      "effect": "Your next attack roll this turn gains +5 bonus (does not stack with other bonuses).",
+      "flavorText": "Breathe. Aim. Release."
+    },
+    {
+      "id": "card_038",
+      "name": "Feint",
+      "type": "Ability",
+      "gearSlot": null,
+      "resourceCost": 2,
+      "durability": null,
+      "isInstant": true,
+      "rarity": "Common",
+      "effect": "Instant: Play during opponent's attack. They roll with Disadvantage on that attack (roll twice, take lower).",
+      "flavorText": "Let them think they have you."
+    },
+    {
+      "id": "card_039",
+      "name": "Backstab",
+      "type": "Ability",
+      "subtype": "Sabotage",
+      "gearSlot": null,
+      "resourceCost": 3,
+      "durability": null,
+      "isInstant": false,
+      "rarity": "Common",
+      "effect": "Sabotage: Opponent's equipped Weapon loses 1 Durability.",
+      "flavorText": "Nothing personal. Mostly."
+    },
+    {
+      "id": "card_040",
+      "name": "Duel",
+      "type": "Ability",
+      "gearSlot": null,
+      "resourceCost": 3,
+      "durability": null,
+      "isInstant": false,
+      "rarity": "Common",
+      "effect": "Both players roll D20. Winner gains 2 Resources. Loser loses their next Chest attack this turn.",
+      "flavorText": "Put your money where your roll is."
+    },
+    {
+      "id": "card_041",
+      "name": "Shield Wall",
+      "type": "Ability",
+      "gearSlot": null,
+      "resourceCost": 3,
+      "durability": null,
+      "isInstant": true,
+      "rarity": "Rare",
+      "effect": "Instant: Play during opponent's Arena attack. Gain +4 Mitigation until end of that attack only.",
+      "flavorText": "The ground shakes. The wall holds."
+    },
+    {
+      "id": "card_042",
+      "name": "Poison Flask",
+      "type": "Ability",
+      "subtype": "Sabotage",
+      "gearSlot": null,
+      "resourceCost": 4,
+      "durability": null,
+      "isInstant": false,
+      "rarity": "Rare",
+      "effect": "Sabotage: Opponent loses 3 HP at the start of each of their next 3 turns.",
+      "flavorText": "Slow. Painful. Deliberate."
+    },
+    {
+      "id": "card_043",
+      "name": "Smoke Bomb",
+      "type": "Ability",
+      "subtype": "Sabotage",
+      "gearSlot": null,
+      "resourceCost": 3,
+      "durability": null,
+      "isInstant": true,
+      "rarity": "Rare",
+      "effect": "Instant: Sabotage. Play during opponent's turn. They roll with Disadvantage on ALL rolls this turn.",
+      "flavorText": "You cannot hit what you cannot see."
+    },
+    {
+      "id": "card_044",
+      "name": "Battle Cry",
+      "type": "Ability",
+      "gearSlot": null,
+      "resourceCost": 4,
+      "durability": null,
+      "isInstant": false,
+      "rarity": "Rare",
+      "effect": "Gain +3 Resources this turn only. Draw 1 card.",
+      "flavorText": "Loud enough to shake the chest. Loud enough to scare the opponent."
+    },
+    {
+      "id": "card_045",
+      "name": "Second Wind",
+      "type": "Ability",
+      "gearSlot": null,
+      "resourceCost": 4,
+      "durability": null,
+      "isInstant": true,
+      "rarity": "Rare",
+      "effect": "Instant: Heal 8 HP. Can only be played when your HP is below 50% of your Max HP.",
+      "flavorText": "Not finished yet."
+    },
+    {
+      "id": "card_046",
+      "name": "Gear Crush",
+      "type": "Ability",
+      "subtype": "Sabotage",
+      "gearSlot": null,
+      "resourceCost": 5,
+      "durability": null,
+      "isInstant": false,
+      "rarity": "Rare",
+      "effect": "Sabotage: Choose one of the opponent's equipped Gear cards. It loses 2 Durability.",
+      "flavorText": "Destroy the armor. Destroy the fighter."
+    },
+    {
+      "id": "card_047",
+      "name": "Execution Strike",
+      "type": "Ability",
+      "gearSlot": null,
+      "resourceCost": 6,
+      "durability": null,
+      "isInstant": false,
+      "rarity": "Epic",
+      "effect": "Deal damage equal to your D20 roll + your full Attack modifier + 10. Must land a Hit (10+) to trigger.",
+      "flavorText": "He saves it. For the right moment. Then uses it."
+    },
+    {
+      "id": "card_048",
+      "name": "Full Repair",
+      "type": "Ability",
+      "gearSlot": null,
+      "resourceCost": 5,
+      "durability": null,
+      "isInstant": false,
+      "rarity": "Epic",
+      "effect": "Restore ALL Gear cards you control to their maximum Durability.",
+      "flavorText": "Good as new. Better than new."
+    },
+    {
+      "id": "card_049",
+      "name": "Perfect Dodge",
+      "type": "Ability",
+      "gearSlot": null,
+      "resourceCost": 5,
+      "durability": null,
+      "isInstant": true,
+      "rarity": "Epic",
+      "effect": "Instant: Negate all damage from one attack. No roll required. Once per game.",
+      "flavorText": "Not luck. Pure read."
+    },
+    {
+      "id": "card_050",
+      "name": "Cursed Blade",
+      "type": "Ability",
+      "subtype": "Sabotage",
+      "gearSlot": null,
+      "resourceCost": 6,
+      "durability": null,
+      "isInstant": false,
+      "rarity": "Epic",
+      "effect": "Sabotage: Opponent's equipped Weapon loses all Durability and is immediately discarded. Cannot be used if opponent has no Weapon equipped.",
+      "flavorText": "The curse does not care who holds it."
+    },
+    {
+      "id": "card_051",
+      "name": "The Killing Blow",
+      "type": "Ability",
+      "gearSlot": null,
+      "resourceCost": 8,
+      "durability": null,
+      "isInstant": false,
+      "rarity": "Legendary",
+      "effect": "Deal damage equal to TRIPLE your D20 roll + all Attack modifiers. On a Crit, this ability resets and can be played again this turn.",
+      "flavorText": "Some strikes end fights. This one ends careers."
+    },
+    {
+      "id": "card_052",
+      "name": "Chaos Nova",
+      "type": "Ability",
+      "gearSlot": null,
+      "resourceCost": 7,
+      "durability": null,
+      "isInstant": false,
+      "rarity": "Legendary",
+      "effect": "Deal 5 damage to ALL gear cards the opponent controls (they each lose 1 Durability). Then deal your D20 roll as direct damage to their Champion.",
+      "flavorText": "It does not discriminate. It destroys everything."
+    },
+    {
+      "id": "card_053",
+      "name": "Loot Run",
+      "type": "Adventure",
+      "gearSlot": null,
+      "resourceCost": 2,
+      "durability": null,
+      "rarity": "Common",
+      "effect": "Adventure (3 turns): At the end of each turn this is active, gain +1 Resource. When complete, draw 2 cards.",
+      "turnsToComplete": 3,
+      "flavorText": "In. Out. Loaded."
+    },
+    {
+      "id": "card_054",
+      "name": "Scout Ahead",
+      "type": "Adventure",
+      "gearSlot": null,
+      "resourceCost": 2,
+      "durability": null,
+      "rarity": "Common",
+      "effect": "Adventure (2 turns): When complete, look at the top 4 cards of your deck and rearrange them in any order.",
+      "turnsToComplete": 2,
+      "flavorText": "Know the path before you walk it."
+    },
+    {
+      "id": "card_055",
+      "name": "Bounty Hunt",
+      "type": "Adventure",
+      "gearSlot": null,
+      "resourceCost": 3,
+      "durability": null,
+      "rarity": "Rare",
+      "effect": "Adventure (3 turns): Track kills. When complete, gain Resources equal to 2x the number of Hits you landed during those 3 turns.",
+      "turnsToComplete": 3,
+      "flavorText": "Dead or alive. Preferably dead, for the bonus."
+    },
+    {
+      "id": "card_056",
+      "name": "Supply Run",
+      "type": "Adventure",
+      "gearSlot": null,
+      "resourceCost": 3,
+      "durability": null,
+      "rarity": "Rare",
+      "effect": "Adventure (3 turns): When complete, choose any Gear card from your discard pile and return it to your hand at no cost.",
+      "turnsToComplete": 3,
+      "flavorText": "Never leave good gear behind."
+    },
+    {
+      "id": "card_057",
+      "name": "Field Medicine",
+      "type": "Adventure",
+      "gearSlot": null,
+      "resourceCost": 3,
+      "durability": null,
+      "rarity": "Rare",
+      "effect": "Adventure (2 turns): When complete, heal 10 HP.",
+      "turnsToComplete": 2,
+      "flavorText": "You would be surprised what a little rest can fix."
+    },
+    {
+      "id": "card_058",
+      "name": "The Long Con",
+      "type": "Adventure",
+      "subtype": "Sabotage",
+      "gearSlot": null,
+      "resourceCost": 4,
+      "durability": null,
+      "rarity": "Epic",
+      "effect": "Adventure (4 turns): Sabotage. When complete, your opponent reveals their hand. You choose one card from it to be permanently discarded.",
+      "turnsToComplete": 4,
+      "flavorText": "Patience is the most dangerous weapon."
+    },
+    {
+      "id": "card_059",
+      "name": "Ancient Ruin Dive",
+      "type": "Adventure",
+      "gearSlot": null,
+      "resourceCost": 5,
+      "durability": null,
+      "rarity": "Epic",
+      "effect": "Adventure (4 turns): When complete, add one random Epic or Legendary card (from outside your deck) to your hand for this game only.",
+      "turnsToComplete": 4,
+      "flavorText": "What is buried is not always lost."
+    },
+    {
+      "id": "card_060",
+      "name": "The Final Raid",
+      "type": "Adventure",
+      "gearSlot": null,
+      "resourceCost": 6,
+      "durability": null,
+      "rarity": "Legendary",
+      "effect": "Adventure (5 turns): When complete, deal 20 damage to your opponent's Champion and restore 5 HP to yourself. This Adventure cannot be cancelled by Sabotage.",
+      "turnsToComplete": 5,
+      "flavorText": "Everything you have built. Everything you have endured. For this."
+    }
+  ],
+  "rarityDistribution": {
+    "Common": 22,
+    "Rare": 22,
+    "Epic": 11,
+    "Legendary": 5,
+    "note": "Pack pull weights: Common 60%, Rare 25%, Epic 12%, Legendary 3%"
+  },
+  "deckBuildingRules": {
+    "deckSize": 40,
+    "maxCopiesPerCard": 2,
+    "requiredChampion": true,
+    "gearSlotLimit": "One active card per slot at a time (Head, Chest, Hands, Feet, Weapon). Deck can contain multiples as redundancy."
+  },
+  "starterDeckSuggestion": {
+    "name": "Iron Path",
+    "champion": "champ_001",
+    "cardList": [
+      {"id": "card_001", "qty": 2},
+      {"id": "card_006", "qty": 2},
+      {"id": "card_010", "qty": 2},
+      {"id": "card_014", "qty": 2},
+      {"id": "card_018", "qty": 2},
+      {"id": "card_022", "qty": 2},
+      {"id": "card_023", "qty": 2},
+      {"id": "card_024", "qty": 2},
+      {"id": "card_025", "qty": 2},
+      {"id": "card_034", "qty": 2},
+      {"id": "card_035", "qty": 2},
+      {"id": "card_036", "qty": 2},
+      {"id": "card_037", "qty": 2},
+      {"id": "card_038", "qty": 2},
+      {"id": "card_039", "qty": 2},
+      {"id": "card_040", "qty": 2},
+      {"id": "card_041", "qty": 2},
+      {"id": "card_053", "qty": 2},
+      {"id": "card_054", "qty": 2},
+      {"id": "card_044", "qty": 2}
+    ],
+    "note": "A balanced beginner deck for Vex the Ironclad. Solid economy, reliable damage, basic disruption."
+  }
+}

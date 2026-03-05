@@ -40,39 +40,61 @@ struct ActiveGearMap: Codable, Equatable {
     var isEmpty: Bool {
         slots.isEmpty
     }
+
+    var equippedCount: Int {
+        slots.count
+    }
 }
 
 // MARK: - Card Reference (lightweight Codable card snapshot for game state)
 
 struct CardReference: Codable, Equatable, Hashable, Identifiable {
     let id: UUID
+    let stringId: String
     let name: String
     let cardType: CardType
+    let subtype: CardSubtype?
     let gearSlot: GearSlot?
     let resourceCost: Int
     var durability: Int?
+    let maxDurability: Int?
     let effectDescription: String
     let rarity: Rarity
     let isInstant: Bool
+    let isTwoHanded: Bool
+    let turnsToComplete: Int?
 
     init(card: Card) {
         self.id = card.id
+        self.stringId = card.stringId
         self.name = card.name
         self.cardType = card.cardType
+        self.subtype = card.subtype
         self.gearSlot = card.gearSlot
         self.resourceCost = card.resourceCost
         self.durability = card.durability
+        self.maxDurability = card.durability
         self.effectDescription = card.effectDescription
         self.rarity = card.rarity
         self.isInstant = card.isInstant
+        self.isTwoHanded = card.isTwoHanded
+        self.turnsToComplete = card.turnsToComplete
     }
+
+    var isGear: Bool { cardType == .gear }
+    var isTalent: Bool { cardType == .talent }
+    var isAbility: Bool { cardType == .ability }
+    var isAdventure: Bool { cardType == .adventure }
+    var isSabotage: Bool { subtype == .sabotage }
 }
 
 // MARK: - Champion Reference (lightweight Codable champion snapshot)
 
 struct ChampionReference: Codable, Equatable {
     let id: UUID
+    let stringId: String
     let name: String
+    let archetype: Archetype
     let hp: Int
     let avoidance: Int
     let mitigation: Int
@@ -82,7 +104,9 @@ struct ChampionReference: Codable, Equatable {
 
     init(champion: Champion) {
         self.id = champion.id
+        self.stringId = champion.stringId
         self.name = champion.name
+        self.archetype = champion.archetype
         self.hp = champion.hp
         self.avoidance = champion.avoidance
         self.mitigation = champion.mitigation
@@ -90,6 +114,39 @@ struct ChampionReference: Codable, Equatable {
         self.tierEffects = champion.tierEffects
         self.rarity = champion.rarity
     }
+}
+
+// MARK: - Active Adventure (tracks in-progress adventure cards)
+
+struct ActiveAdventure: Codable, Equatable {
+    let card: CardReference
+    var turnsRemaining: Int
+    var hitsDuringAdventure: Int
+
+    init(card: CardReference) {
+        self.card = card
+        self.turnsRemaining = card.turnsToComplete ?? 0
+        self.hitsDuringAdventure = 0
+    }
+
+    var isComplete: Bool { turnsRemaining <= 0 }
+}
+
+// MARK: - Status Effect (poison, bleed, etc.)
+
+struct StatusEffect: Codable, Equatable {
+    let type: StatusEffectType
+    var turnsRemaining: Int
+    let damagePerTurn: Int
+
+    var isExpired: Bool { turnsRemaining <= 0 }
+}
+
+enum StatusEffectType: String, Codable {
+    case poison
+    case bleed
+    case mitigationReduction
+    case disadvantage
 }
 
 // MARK: - Game Session
@@ -102,13 +159,15 @@ final class GameSession {
     // Player champion snapshot
     var playerChampion: ChampionReference?
 
-    // Card zones (stored as Codable snapshots to avoid SwiftData relationship complexity)
+    // Card zones
     var playerHand: [CardReference]
     var playerDeck: [CardReference]
+    var playerDiscard: [CardReference]
 
     // Resources & HP
     var playerResources: Int
     var playerHP: Int
+    var playerMaxHP: Int
 
     // Treasure chests
     var chestCount: Int
@@ -118,6 +177,22 @@ final class GameSession {
     // Equipment state
     var activeGear: ActiveGearMap
     var activeTalents: [CardReference]
+    var activeAdventures: [ActiveAdventure]
+
+    // Status effects on player and opponent
+    var playerStatusEffects: [StatusEffect]
+    var opponentStatusEffects: [StatusEffect]
+
+    // Tracking flags for once-per-game effects
+    var firstBloodUsed: Bool
+    var perfectDodgeUsed: Bool
+    var goldweaveMittsUsed: Bool
+    var ironWillTriggered: Bool
+
+    // Turn tracking
+    var currentTurn: Int
+    var consecutiveHits: Int
+    var handSizeBonus: Int
 
     // Metadata
     var startedAt: Date
@@ -126,6 +201,7 @@ final class GameSession {
 
     static let maxChests = 3
     static let startingResources = 3
+    static let defaultHandSize = 5
 
     init(
         phase: GamePhase = .raid,
@@ -137,13 +213,25 @@ final class GameSession {
         self.playerChampion = champion.map { ChampionReference(champion: $0) }
         self.playerHand = []
         self.playerDeck = deck?.cards.map { CardReference(card: $0) } ?? []
+        self.playerDiscard = []
         self.playerResources = GameSession.startingResources
         self.playerHP = champion?.hp ?? 30
+        self.playerMaxHP = champion?.hp ?? 30
         self.chestCount = 0
         self.currentChestIntegrity = 0
         self.currentChestTier = 1
         self.activeGear = ActiveGearMap()
         self.activeTalents = []
+        self.activeAdventures = []
+        self.playerStatusEffects = []
+        self.opponentStatusEffects = []
+        self.firstBloodUsed = false
+        self.perfectDodgeUsed = false
+        self.goldweaveMittsUsed = false
+        self.ironWillTriggered = false
+        self.currentTurn = 1
+        self.consecutiveHits = 0
+        self.handSizeBonus = 0
         self.startedAt = Date()
     }
 
@@ -153,5 +241,9 @@ final class GameSession {
 
     var isGameOver: Bool {
         playerHP <= 0 || endedAt != nil
+    }
+
+    var effectiveHandSize: Int {
+        GameSession.defaultHandSize + handSizeBonus
     }
 }

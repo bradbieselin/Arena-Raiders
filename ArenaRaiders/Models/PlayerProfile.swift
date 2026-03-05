@@ -5,6 +5,7 @@ import SwiftData
 
 struct OwnedCardEntry: Codable, Equatable, Hashable, Identifiable {
     let cardId: UUID
+    let cardStringId: String
     let cardName: String
     var quantity: Int
 
@@ -12,6 +13,7 @@ struct OwnedCardEntry: Codable, Equatable, Hashable, Identifiable {
 
     init(card: Card, quantity: Int = 1) {
         self.cardId = card.id
+        self.cardStringId = card.stringId
         self.cardName = card.name
         self.quantity = quantity
     }
@@ -28,6 +30,7 @@ final class PlayerProfile {
     var currency: Int
     var hasRemovedAds: Bool
     var createdAt: Date
+    var hasCompletedFirstLaunch: Bool
 
     // Card collection stored as Codable array with quantities
     var cardCollection: [OwnedCardEntry]
@@ -49,6 +52,7 @@ final class PlayerProfile {
         self.currency = currency
         self.hasRemovedAds = false
         self.createdAt = Date()
+        self.hasCompletedFirstLaunch = false
         self.cardCollection = []
         self.unlockedChampions = []
         self.savedDecks = []
@@ -68,7 +72,7 @@ final class PlayerProfile {
     // MARK: - Collection Management
 
     func addCard(_ card: Card, quantity: Int = 1) {
-        if let index = cardCollection.firstIndex(where: { $0.cardId == card.id }) {
+        if let index = cardCollection.firstIndex(where: { $0.cardStringId == card.stringId }) {
             cardCollection[index].quantity += quantity
         } else {
             cardCollection.append(OwnedCardEntry(card: card, quantity: quantity))
@@ -76,7 +80,7 @@ final class PlayerProfile {
     }
 
     func removeCard(_ card: Card, quantity: Int = 1) {
-        guard let index = cardCollection.firstIndex(where: { $0.cardId == card.id }) else { return }
+        guard let index = cardCollection.firstIndex(where: { $0.cardStringId == card.stringId }) else { return }
         cardCollection[index].quantity -= quantity
         if cardCollection[index].quantity <= 0 {
             cardCollection.remove(at: index)
@@ -84,7 +88,7 @@ final class PlayerProfile {
     }
 
     func quantityOwned(of card: Card) -> Int {
-        cardCollection.first(where: { $0.cardId == card.id })?.quantity ?? 0
+        cardCollection.first(where: { $0.cardStringId == card.stringId })?.quantity ?? 0
     }
 
     var uniqueCardsOwned: Int {

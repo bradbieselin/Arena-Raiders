@@ -5,57 +5,64 @@ import SwiftData
 
 struct TierEffect: Codable, Equatable, Hashable {
     let tier: Int
+    let name: String
     let description: String
-    let effect: PassiveEffect
 
-    init(tier: Int, description: String, effect: PassiveEffect) {
-        precondition(tier >= 1 && tier <= 2, "Tier must be 1 or 2")
+    init(tier: Int, name: String, description: String) {
         self.tier = tier
+        self.name = name
         self.description = description
-        self.effect = effect
     }
 }
 
 // MARK: - Innate Passive
 
 struct InnatePassive: Codable, Equatable, Hashable {
+    let name: String
     let description: String
-    let effect: PassiveEffect
 }
 
 // MARK: - Champion
 
 @Model
 final class Champion {
-    #Unique<Champion>([\.name])
+    #Unique<Champion>([\.stringId])
 
     var id: UUID
+    var stringId: String
     var name: String
+    var archetype: Archetype
     var hp: Int
     var avoidance: Int
     var mitigation: Int
     var innatePassive: InnatePassive
     var tierEffects: [TierEffect]
     var rarity: Rarity
+    var flavorText: String
 
     init(
+        stringId: String,
         name: String,
+        archetype: Archetype,
         hp: Int,
         avoidance: Int,
         mitigation: Int,
         innatePassive: InnatePassive,
         tierEffects: [TierEffect] = [],
-        rarity: Rarity = .common
+        rarity: Rarity = .common,
+        flavorText: String = ""
     ) {
-        precondition(tierEffects.count <= 2, "Champion can have at most 2 tier effects")
         self.id = UUID()
+        self.stringId = stringId
         self.name = name
+        self.archetype = archetype
         self.hp = hp
         self.avoidance = avoidance
         self.mitigation = mitigation
         self.innatePassive = innatePassive
         self.tierEffects = tierEffects
         self.rarity = rarity
+        self.flavorText = flavorText
     }
 
     func tierEffect(for tier: Int) -> TierEffect? {

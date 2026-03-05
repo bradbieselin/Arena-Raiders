@@ -6,6 +6,7 @@ final class AIOpponentTests: XCTestCase {
     // MARK: - Helpers
 
     private func makeCard(
+        stringId: String = "card_test",
         name: String = "Test Card",
         type: CardType = .gear,
         gearSlot: GearSlot? = .weapon,
@@ -13,6 +14,7 @@ final class AIOpponentTests: XCTestCase {
         durability: Int? = 3
     ) -> CardReference {
         CardReference(card: Card(
+            stringId: stringId,
             name: name,
             cardType: type,
             gearSlot: type == .gear ? gearSlot : nil,
@@ -30,11 +32,13 @@ final class AIOpponentTests: XCTestCase {
         hand: [CardReference] = []
     ) -> AIState {
         let champion = ChampionReference(champion: Champion(
+            stringId: "champ_ai",
             name: "AI Champion",
+            archetype: .warrior,
             hp: 30,
             avoidance: 12,
             mitigation: 3,
-            innatePassive: InnatePassive(description: "AI passive", effect: .thorns),
+            innatePassive: InnatePassive(name: "AI Passive", description: "AI passive desc"),
             tierEffects: []
         ))
 
@@ -97,7 +101,6 @@ final class AIOpponentTests: XCTestCase {
         state.activeGear.equipRef(existingWeapon, in: .weapon)
 
         let action = ai.decideAction(state: state)
-        // Should play highest cost card since weapon is equipped and HP is full
         XCTAssertEqual(action, .playCard(expensiveAbility))
     }
 
@@ -109,7 +112,6 @@ final class AIOpponentTests: XCTestCase {
         let heal = makeCard(name: "Heal", type: .ability, gearSlot: nil, cost: 3)
         let gear = makeCard(name: "Helm", type: .gear, gearSlot: .head, cost: 4)
 
-        // Weapon already equipped, HP below 50%
         var state = makeAIState(resources: 10, hp: 10, hand: [weapon, heal, gear])
         state.activeGear.equipRef(weapon, in: .weapon)
 
@@ -125,7 +127,6 @@ final class AIOpponentTests: XCTestCase {
         let mid = makeCard(name: "Mid Chest", type: .gear, gearSlot: .chest, cost: 3)
         let expensive = makeCard(name: "Fancy Boots", type: .gear, gearSlot: .feet, cost: 5)
 
-        // Weapon already equipped, full HP
         var state = makeAIState(resources: 10, hand: [cheap, mid, expensive])
         state.activeGear.equipRef(makeCard(), in: .weapon)
 
@@ -146,7 +147,6 @@ final class AIOpponentTests: XCTestCase {
 
         let actions = ai.executeTurn(state: &state)
 
-        // Should play weapon first (priority), then helm, then end turn
         let playActions = actions.filter {
             if case .playCard = $0 { return true }
             return false
@@ -167,7 +167,6 @@ final class AIOpponentTests: XCTestCase {
 
         _ = ai.executeTurn(state: &state)
 
-        // Drew a card but couldn't play it (cost 99), hand should have 1 card
         XCTAssertEqual(state.hand.count, 1)
         XCTAssertEqual(state.hand.first?.name, "Deck Card")
         XCTAssertTrue(state.deck.isEmpty)

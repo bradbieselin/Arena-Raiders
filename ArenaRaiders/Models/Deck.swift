@@ -8,7 +8,7 @@ final class Deck {
     var champion: Champion?
     var cards: [Card]
 
-    static let requiredCardCount = 40
+    static let requiredCardCount = DeckRules.deckSize
 
     init(name: String = "New Deck", champion: Champion? = nil, cards: [Card] = []) {
         self.id = UUID()

@@ -31,20 +31,10 @@ struct DataManager {
         }
     }
 
+    /// Seeds starter data on first launch and ensures a player profile exists
     @MainActor
-    func ensurePlayerProfileExists() {
+    func seedOnFirstLaunch() {
         let context = modelContainer.mainContext
-        let descriptor = FetchDescriptor<PlayerProfile>()
-
-        do {
-            let profiles = try context.fetch(descriptor)
-            if profiles.isEmpty {
-                let newProfile = PlayerProfile()
-                context.insert(newProfile)
-                try context.save()
-            }
-        } catch {
-            print("Error ensuring player profile: \(error)")
-        }
+        StarterDataLoader.seedIfNeeded(context: context)
     }
 }
