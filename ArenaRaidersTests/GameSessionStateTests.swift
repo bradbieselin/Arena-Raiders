@@ -50,7 +50,7 @@ final class GameSessionStateTests: XCTestCase {
     // MARK: - Computed Properties
 
     func testChestsRemaining() {
-        let session = GameSession()
+        var session = GameSession()
         XCTAssertEqual(session.chestsRemaining, 3)
 
         session.chestCount = 1
@@ -61,7 +61,7 @@ final class GameSessionStateTests: XCTestCase {
     }
 
     func testIsGameOver() {
-        let session = GameSession(champion: makeChampion(hp: 10))
+        var session = GameSession(champion: makeChampion(hp: 10))
         XCTAssertFalse(session.isGameOver)
 
         session.playerHP = 0
@@ -73,7 +73,7 @@ final class GameSessionStateTests: XCTestCase {
     }
 
     func testEffectiveHandSize() {
-        let session = GameSession()
+        var session = GameSession()
         XCTAssertEqual(session.effectiveHandSize, 5)
 
         session.handSizeBonus = 2
@@ -85,7 +85,7 @@ final class GameSessionStateTests: XCTestCase {
     func testEndTurnIncrementsTurnAndResetsResources() {
         let engine = GameEngine()
         let champion = makeChampion()
-        let session = GameSession(champion: champion)
+        var session = GameSession(champion: champion)
         session.playerResources = 5
 
         engine.endTurn(session: &session)
@@ -97,7 +97,7 @@ final class GameSessionStateTests: XCTestCase {
 
     func testEndTurnProcessesStatusEffects() {
         let engine = GameEngine()
-        let session = GameSession(champion: makeChampion(hp: 30))
+        var session = GameSession(champion: makeChampion(hp: 30))
         session.playerStatusEffects = [
             StatusEffect(type: .poison, turnsRemaining: 2, damagePerTurn: 3)
         ]
@@ -111,7 +111,7 @@ final class GameSessionStateTests: XCTestCase {
 
     func testEndTurnExpiresStatusEffects() {
         let engine = GameEngine()
-        let session = GameSession(champion: makeChampion(hp: 30))
+        var session = GameSession(champion: makeChampion(hp: 30))
         session.playerStatusEffects = [
             StatusEffect(type: .bleed, turnsRemaining: 1, damagePerTurn: 2)
         ]
@@ -126,7 +126,7 @@ final class GameSessionStateTests: XCTestCase {
 
     func testTickAdventuresDecrementsAndCompletes() {
         let engine = GameEngine()
-        let session = GameSession(champion: makeChampion())
+        var session = GameSession(champion: makeChampion())
         let adventureCard = makeCardRef(
             stringId: "card_057", // Field Medicine
             cardType: .adventure,
@@ -148,7 +148,7 @@ final class GameSessionStateTests: XCTestCase {
 
     func testTickAdventuresLootRunGivesResourcePerTurn() {
         let engine = GameEngine()
-        let session = GameSession(champion: makeChampion())
+        var session = GameSession(champion: makeChampion())
         let lootCard = makeCardRef(
             stringId: "card_053", // Loot Run
             cardType: .adventure,
@@ -171,7 +171,7 @@ final class GameSessionStateTests: XCTestCase {
 
     func testGoldweaveMittsCarryOver() {
         let engine = GameEngine()
-        let session = GameSession(champion: makeChampion())
+        var session = GameSession(champion: makeChampion())
         session.playerResources = 5
 
         let mitts = makeCardRef(stringId: "card_017", gearSlot: .hands)
@@ -187,7 +187,7 @@ final class GameSessionStateTests: XCTestCase {
 
     func testGoldweaveMittsOnlyUsedOnce() {
         let engine = GameEngine()
-        let session = GameSession(champion: makeChampion())
+        var session = GameSession(champion: makeChampion())
 
         let mitts = makeCardRef(stringId: "card_017", gearSlot: .hands)
         session.activeGear.equipRef(mitts, in: .hands)
@@ -208,7 +208,7 @@ final class GameSessionStateTests: XCTestCase {
 
     func testCrownOfClarityDrawsExtraCard() {
         let engine = GameEngine()
-        let session = GameSession(champion: makeChampion())
+        var session = GameSession(champion: makeChampion())
         session.playerDeck = (0..<10).map { i in
             makeCardRef(stringId: "d\(i)", cardType: .talent, gearSlot: nil, durability: nil)
         }
@@ -228,7 +228,7 @@ final class GameSessionStateTests: XCTestCase {
 
     func testSetupGameDrawsOpeningHandAndSetsChest() {
         let engine = GameEngine()
-        let session = GameSession(champion: makeChampion())
+        var session = GameSession(champion: makeChampion())
         session.playerDeck = (0..<40).map { i in
             makeCardRef(stringId: "c\(i)", cardType: .talent, gearSlot: nil, durability: nil)
         }
@@ -245,7 +245,7 @@ final class GameSessionStateTests: XCTestCase {
 
     func testAdvanceChestProgressesTiers() {
         let engine = GameEngine()
-        let session = GameSession(champion: makeChampion())
+        var session = GameSession(champion: makeChampion())
         session.chestCount = 0
 
         engine.advanceChest(session: &session)
@@ -261,7 +261,7 @@ final class GameSessionStateTests: XCTestCase {
 
     func testAdvanceChestToArenaPhase() {
         let engine = GameEngine()
-        let session = GameSession(champion: makeChampion())
+        var session = GameSession(champion: makeChampion())
         session.chestCount = 2
 
         engine.advanceChest(session: &session)
@@ -273,7 +273,7 @@ final class GameSessionStateTests: XCTestCase {
 
     func testPlayBandageHeals4HP() {
         let engine = GameEngine()
-        let session = GameSession(champion: makeChampion(hp: 30))
+        var session = GameSession(champion: makeChampion(hp: 30))
         session.playerHP = 20
         session.playerResources = 10
 
@@ -295,7 +295,7 @@ final class GameSessionStateTests: XCTestCase {
 
     func testPlayBattleCryGivesResourcesAndDraws() {
         let engine = GameEngine()
-        let session = GameSession(champion: makeChampion())
+        var session = GameSession(champion: makeChampion())
         session.playerResources = 10
         session.playerDeck = [
             makeCardRef(stringId: "d1", cardType: .talent, gearSlot: nil, durability: nil)
@@ -322,7 +322,7 @@ final class GameSessionStateTests: XCTestCase {
 
     func testPlayTalentToughnessIncreaseMaxHP() {
         let engine = GameEngine()
-        let session = GameSession(champion: makeChampion(hp: 30))
+        var session = GameSession(champion: makeChampion(hp: 30))
         session.playerResources = 10
 
         let toughness = CardReference(card: Card(
@@ -343,7 +343,7 @@ final class GameSessionStateTests: XCTestCase {
 
     func testPlayTalentQuickHandsIncreasesHandSize() {
         let engine = GameEngine()
-        let session = GameSession(champion: makeChampion())
+        var session = GameSession(champion: makeChampion())
         session.playerResources = 10
 
         let quickHands = CardReference(card: Card(
