@@ -27,7 +27,20 @@ struct DataManager {
                 configurations: [modelConfiguration]
             )
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            // Schema migration failed — delete old store and retry
+            print("DataManager: Initial container failed (\(error)), recreating store...")
+            let storeURL = modelConfiguration.url
+            try? FileManager.default.removeItem(at: storeURL)
+            try? FileManager.default.removeItem(at: storeURL.deletingPathExtension().appendingPathExtension("store-wal"))
+            try? FileManager.default.removeItem(at: storeURL.deletingPathExtension().appendingPathExtension("store-shm"))
+            do {
+                modelContainer = try ModelContainer(
+                    for: schema,
+                    configurations: [modelConfiguration]
+                )
+            } catch {
+                fatalError("Could not create ModelContainer after reset: \(error)")
+            }
         }
     }
 
