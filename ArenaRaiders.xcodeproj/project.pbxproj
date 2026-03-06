@@ -43,6 +43,11 @@
 		A10000010000000000000067 /* RaidPhaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000067; };
 		A10000010000000000000068 /* ArenaPhaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000068; };
 		A10000010000000000000069 /* GameScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000069; };
+		A10000010000000000000070 /* FannedHandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000070; };
+		A10000010000000000000071 /* ManaCrystalBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000071; };
+		A10000010000000000000072 /* TurnBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000072; };
+		A10000010000000000000073 /* ChampionPortraitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000073; };
+		A10000010000000000000074 /* GameBoardBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000074; };
 		A10000010000000000000080 /* SaveSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000080; };
 		A10000010000000000000081 /* DeckBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000081; };
 		A10000010000000000000050 /* ModelValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000050; };
@@ -112,6 +117,11 @@
 		A20000010000000000000067 /* RaidPhaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaidPhaseView.swift; sourceTree = "<group>"; };
 		A20000010000000000000068 /* ArenaPhaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArenaPhaseView.swift; sourceTree = "<group>"; };
 		A20000010000000000000069 /* GameScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScreenView.swift; sourceTree = "<group>"; };
+		A20000010000000000000070 /* FannedHandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FannedHandView.swift; sourceTree = "<group>"; };
+		A20000010000000000000071 /* ManaCrystalBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManaCrystalBar.swift; sourceTree = "<group>"; };
+		A20000010000000000000072 /* TurnBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnBanner.swift; sourceTree = "<group>"; };
+		A20000010000000000000073 /* ChampionPortraitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChampionPortraitView.swift; sourceTree = "<group>"; };
+		A20000010000000000000074 /* GameBoardBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameBoardBackground.swift; sourceTree = "<group>"; };
 		A20000010000000000000080 /* SaveSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSystem.swift; sourceTree = "<group>"; };
 		A20000010000000000000081 /* DeckBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckBuilderView.swift; sourceTree = "<group>"; };
 		A20000010000000000000070 /* RollDistributionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollDistributionTests.swift; sourceTree = "<group>"; };
@@ -234,6 +244,11 @@
 				A20000010000000000000067 /* RaidPhaseView.swift */,
 				A20000010000000000000068 /* ArenaPhaseView.swift */,
 				A20000010000000000000069 /* GameScreenView.swift */,
+				A20000010000000000000070 /* FannedHandView.swift */,
+				A20000010000000000000071 /* ManaCrystalBar.swift */,
+				A20000010000000000000072 /* TurnBanner.swift */,
+				A20000010000000000000073 /* ChampionPortraitView.swift */,
+				A20000010000000000000074 /* GameBoardBackground.swift */,
 			);
 			path = Game;
 			sourceTree = "<group>";
@@ -427,6 +442,11 @@
 				A10000010000000000000067 /* RaidPhaseView.swift in Sources */,
 				A10000010000000000000068 /* ArenaPhaseView.swift in Sources */,
 				A10000010000000000000069 /* GameScreenView.swift in Sources */,
+				A10000010000000000000070 /* FannedHandView.swift in Sources */,
+				A10000010000000000000071 /* ManaCrystalBar.swift in Sources */,
+				A10000010000000000000072 /* TurnBanner.swift in Sources */,
+				A10000010000000000000073 /* ChampionPortraitView.swift in Sources */,
+				A10000010000000000000074 /* GameBoardBackground.swift in Sources */,
 				A10000010000000000000080 /* SaveSystem.swift in Sources */,
 				A10000010000000000000081 /* DeckBuilderView.swift in Sources */,
 			);

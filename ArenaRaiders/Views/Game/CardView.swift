@@ -5,64 +5,139 @@ struct CardView: View {
     var isSelected: Bool = false
     var isAffordable: Bool = true
 
+    @State private var legendaryPulse: Bool = false
+
+    private var glowColor: Color {
+        isSelected ? GameTheme.gold : GameTheme.rarityColor(card.rarity)
+    }
+
+    private var glowRadius: CGFloat {
+        if isSelected { return 12 }
+        return GameTheme.rarityGlowRadius(card.rarity)
+    }
+
     var body: some View {
-        VStack(spacing: 4) {
-            // Cost badge
-            HStack {
-                HStack(spacing: 2) {
-                    Image(systemName: "circle.fill")
-                        .font(.system(size: 8))
-                        .foregroundColor(GameTheme.gold)
+        VStack(spacing: 0) {
+            // Top 60%: Card art area with type icon
+            ZStack(alignment: .topLeading) {
+                // Art background
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                GameTheme.surfaceDark,
+                                GameTheme.cardBackground.opacity(0.6)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(height: 72)
+
+                // Card type icon centered
+                cardIcon
+                    .font(.system(size: 28))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.white.opacity(0.9), .white.opacity(0.5)],
+                            startPoint: .top, endPoint: .bottom
+                        )
+                    )
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                // Cost gem (top-left)
+                ZStack {
+                    Image(systemName: "diamond.fill")
+                        .font(.system(size: 20))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [GameTheme.manaBlue, GameTheme.manaBlue.opacity(0.6)],
+                                startPoint: .top, endPoint: .bottom
+                            )
+                        )
                     Text("\(card.resourceCost)")
-                        .font(.system(size: 12, weight: .bold, design: .rounded))
-                        .foregroundColor(GameTheme.gold)
+                        .font(.system(size: 10, weight: .black, design: .rounded))
+                        .foregroundColor(.white)
                 }
-                Spacer()
-                if let dur = card.durability {
-                    HStack(spacing: 2) {
-                        Image(systemName: "shield.fill")
-                            .font(.system(size: 8))
-                            .foregroundColor(.white.opacity(0.7))
-                        Text("\(dur)")
-                            .font(.system(size: 11, weight: .semibold, design: .rounded))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                }
+                .offset(x: 3, y: 3)
             }
+            .frame(height: 72)
 
-            // Card type icon
-            cardIcon
-                .font(.system(size: 22))
-                .foregroundColor(.white.opacity(0.9))
-                .frame(height: 28)
-
-            // Name
+            // Name banner (middle)
             Text(card.name)
-                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .font(.system(size: 9, weight: .bold, design: .rounded))
                 .foregroundColor(.white)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
-                .frame(height: 26)
+                .frame(maxWidth: .infinity)
+                .frame(height: 22)
+                .background(Color.black.opacity(0.5))
 
-            // Type label
-            Text(card.cardType.displayName)
-                .font(.system(size: 8, weight: .medium))
-                .foregroundColor(.white.opacity(0.5))
+            // Bottom 30%: Effect text + durability
+            VStack(spacing: 2) {
+                Text(card.effectDescription)
+                    .font(.system(size: 7, weight: .medium))
+                    .foregroundColor(.white.opacity(0.7))
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+
+                // Durability pips
+                if let dur = card.durability, let maxDur = card.maxDurability {
+                    HStack(spacing: 3) {
+                        ForEach(0..<maxDur, id: \.self) { i in
+                            Circle()
+                                .fill(i < dur ? GameTheme.gold : Color.white.opacity(0.15))
+                                .frame(width: 4, height: 4)
+                        }
+                    }
+                }
+
+                // Type label
+                Text(card.cardType.displayName)
+                    .font(.system(size: 7, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.4))
+            }
+            .padding(.horizontal, 4)
+            .padding(.vertical, 3)
+            .frame(height: 36)
         }
-        .padding(8)
-        .frame(width: 90, height: 120)
+        .frame(width: 80, height: 130)
         .background(GameTheme.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(
-                    isSelected ? GameTheme.gold : GameTheme.rarityColor(card.rarity),
-                    lineWidth: isSelected ? 2.5 : 1.5
-                )
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(glowColor.opacity(isSelected ? 1.0 : 0.6), lineWidth: isSelected ? 2 : 1)
         )
-        .opacity(isAffordable ? 1.0 : 0.5)
+        .shadow(color: glowColor.opacity(isSelected ? 0.8 : 0.3), radius: glowRadius)
+        // Legendary pulse
+        .shadow(
+            color: card.rarity == .legendary ? GameTheme.gold.opacity(legendaryPulse ? 0.5 : 0.1) : .clear,
+            radius: legendaryPulse ? 14 : 4
+        )
+        // Unaffordable overlay
+        .overlay(
+            Group {
+                if !isAffordable {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.black.opacity(0.5))
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: 16))
+                            .foregroundColor(.white.opacity(0.5))
+                    }
+                }
+            }
+        )
         .scaleEffect(isSelected ? 1.08 : 1.0)
         .animation(.easeInOut(duration: 0.15), value: isSelected)
+        .onAppear {
+            if card.rarity == .legendary {
+                withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                    legendaryPulse = true
+                }
+            }
+        }
     }
 
     @ViewBuilder
