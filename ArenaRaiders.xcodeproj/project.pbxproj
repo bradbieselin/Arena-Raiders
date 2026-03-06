@@ -33,6 +33,16 @@
 		A10000010000000000000040 /* GameEffectHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000040; };
 		A10000010000000000000041 /* StarterDataLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000041; };
 		A10000010000000000000042 /* arena_raiders_starter_data.json in Resources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000042; };
+		A10000010000000000000060 /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000060; };
+		A10000010000000000000061 /* GameTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000061; };
+		A10000010000000000000062 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000062; };
+		A10000010000000000000063 /* HPBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000063; };
+		A10000010000000000000064 /* RollOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000064; };
+		A10000010000000000000065 /* ResourceCounterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000065; };
+		A10000010000000000000066 /* GearSlotsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000066; };
+		A10000010000000000000067 /* RaidPhaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000067; };
+		A10000010000000000000068 /* ArenaPhaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000068; };
+		A10000010000000000000069 /* GameScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000069; };
 		A10000010000000000000050 /* ModelValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000050; };
 		A10000010000000000000051 /* EnumsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000051; };
 		A10000010000000000000052 /* GameEffectHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000052; };
@@ -42,6 +52,13 @@
 		A10000010000000000000056 /* PlayerProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000056; };
 		A10000010000000000000057 /* StarterDataLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000057; };
 		A10000010000000000000058 /* StarterDataSeedingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000058; };
+		A10000010000000000000070 /* RollDistributionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000070; };
+		A10000010000000000000071 /* ResourceEconomyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000071; };
+		A10000010000000000000072 /* GearSlotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000072; };
+		A10000010000000000000073 /* DurabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000073; };
+		A10000010000000000000074 /* PhaseProgressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000074; };
+		A10000010000000000000075 /* ArenaCombatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000075; };
+		A10000010000000000000076 /* GameSimulationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000076; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -82,6 +99,23 @@
 		A20000010000000000000056 /* PlayerProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerProfileTests.swift; sourceTree = "<group>"; };
 		A20000010000000000000057 /* StarterDataLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarterDataLoaderTests.swift; sourceTree = "<group>"; };
 		A20000010000000000000058 /* StarterDataSeedingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarterDataSeedingTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000060 /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
+		A20000010000000000000061 /* GameTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTheme.swift; sourceTree = "<group>"; };
+		A20000010000000000000062 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
+		A20000010000000000000063 /* HPBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HPBarView.swift; sourceTree = "<group>"; };
+		A20000010000000000000064 /* RollOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollOverlayView.swift; sourceTree = "<group>"; };
+		A20000010000000000000065 /* ResourceCounterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceCounterView.swift; sourceTree = "<group>"; };
+		A20000010000000000000066 /* GearSlotsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GearSlotsView.swift; sourceTree = "<group>"; };
+		A20000010000000000000067 /* RaidPhaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaidPhaseView.swift; sourceTree = "<group>"; };
+		A20000010000000000000068 /* ArenaPhaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArenaPhaseView.swift; sourceTree = "<group>"; };
+		A20000010000000000000069 /* GameScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScreenView.swift; sourceTree = "<group>"; };
+		A20000010000000000000070 /* RollDistributionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollDistributionTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000071 /* ResourceEconomyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceEconomyTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000072 /* GearSlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GearSlotTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000073 /* DurabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurabilityTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000074 /* PhaseProgressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhaseProgressionTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000075 /* ArenaCombatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArenaCombatTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000076 /* GameSimulationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSimulationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,6 +159,13 @@
 				A20000010000000000000056 /* PlayerProfileTests.swift */,
 				A20000010000000000000057 /* StarterDataLoaderTests.swift */,
 				A20000010000000000000058 /* StarterDataSeedingTests.swift */,
+				A20000010000000000000070 /* RollDistributionTests.swift */,
+				A20000010000000000000071 /* ResourceEconomyTests.swift */,
+				A20000010000000000000072 /* GearSlotTests.swift */,
+				A20000010000000000000073 /* DurabilityTests.swift */,
+				A20000010000000000000074 /* PhaseProgressionTests.swift */,
+				A20000010000000000000075 /* ArenaCombatTests.swift */,
+				A20000010000000000000076 /* GameSimulationTests.swift */,
 			);
 			path = ArenaRaidersTests;
 			sourceTree = "<group>";
@@ -168,14 +209,32 @@
 				A20000010000000000000012 /* CollectionView.swift */,
 				A20000010000000000000013 /* ShopView.swift */,
 				A20000010000000000000014 /* ProfileView.swift */,
+				A40000010000000000000011 /* Game */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000011 /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				A20000010000000000000061 /* GameTheme.swift */,
+				A20000010000000000000062 /* CardView.swift */,
+				A20000010000000000000063 /* HPBarView.swift */,
+				A20000010000000000000064 /* RollOverlayView.swift */,
+				A20000010000000000000065 /* ResourceCounterView.swift */,
+				A20000010000000000000066 /* GearSlotsView.swift */,
+				A20000010000000000000067 /* RaidPhaseView.swift */,
+				A20000010000000000000068 /* ArenaPhaseView.swift */,
+				A20000010000000000000069 /* GameScreenView.swift */,
+			);
+			path = Game;
 			sourceTree = "<group>";
 		};
 		A40000010000000000000005 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
 				A20000010000000000000008 /* AppState.swift */,
+				A20000010000000000000060 /* GameViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -349,6 +408,16 @@
 				A10000010000000000000021 /* AIOpponent.swift in Sources */,
 				A10000010000000000000040 /* GameEffectHandler.swift in Sources */,
 				A10000010000000000000041 /* StarterDataLoader.swift in Sources */,
+				A10000010000000000000060 /* GameViewModel.swift in Sources */,
+				A10000010000000000000061 /* GameTheme.swift in Sources */,
+				A10000010000000000000062 /* CardView.swift in Sources */,
+				A10000010000000000000063 /* HPBarView.swift in Sources */,
+				A10000010000000000000064 /* RollOverlayView.swift in Sources */,
+				A10000010000000000000065 /* ResourceCounterView.swift in Sources */,
+				A10000010000000000000066 /* GearSlotsView.swift in Sources */,
+				A10000010000000000000067 /* RaidPhaseView.swift in Sources */,
+				A10000010000000000000068 /* ArenaPhaseView.swift in Sources */,
+				A10000010000000000000069 /* GameScreenView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -367,6 +436,13 @@
 				A10000010000000000000056 /* PlayerProfileTests.swift in Sources */,
 				A10000010000000000000057 /* StarterDataLoaderTests.swift in Sources */,
 				A10000010000000000000058 /* StarterDataSeedingTests.swift in Sources */,
+				A10000010000000000000070 /* RollDistributionTests.swift in Sources */,
+				A10000010000000000000071 /* ResourceEconomyTests.swift in Sources */,
+				A10000010000000000000072 /* GearSlotTests.swift in Sources */,
+				A10000010000000000000073 /* DurabilityTests.swift in Sources */,
+				A10000010000000000000074 /* PhaseProgressionTests.swift in Sources */,
+				A10000010000000000000075 /* ArenaCombatTests.swift in Sources */,
+				A10000010000000000000076 /* GameSimulationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
