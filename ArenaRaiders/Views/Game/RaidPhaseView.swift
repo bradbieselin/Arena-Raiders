@@ -3,250 +3,247 @@ import SwiftUI
 struct RaidPhaseView: View {
     @Bindable var vm: GameViewModel
 
-    @State private var endTurnGlow: Bool = false
-
     var body: some View {
-        ZStack {
-            // Main layout: top opponent zone, center battlefield, bottom player zone
-            VStack(spacing: 0) {
-                // MARK: - Top: Opponent Zone (face-down cards + deck)
-                opponentZone
-                    .frame(height: 50)
+        GeometryReader { geo in
+            ZStack {
+                // LAYER 2 - Main HStack
+                HStack(spacing: 0) {
+                    // LEFT COLUMN - Player Info
+                    leftColumn
+                        .frame(width: 120)
 
-                // MARK: - Center: Battlefield
-                centerBattlefield
-                    .frame(maxHeight: .infinity)
+                    // CENTER COLUMN - Battlefield
+                    centerColumn
 
-                // MARK: - Bottom: Player Zone
-                playerZone
+                    // RIGHT COLUMN - AI Info
+                    rightColumn
+                        .frame(width: 120)
+                }
+                .padding(.horizontal, 8)
+
+                // Roll Overlay
+                if vm.showRoll, let roll = vm.rollResult {
+                    RollOverlayView(
+                        rollValue: roll,
+                        label: vm.rollLabel,
+                        labelColor: vm.rollColor
+                    )
+                    .allowsHitTesting(false)
+                    .transition(.scale.combined(with: .opacity))
+                }
             }
-
-            // MARK: - Roll Overlay (center, over chest)
-            if vm.showRoll, let roll = vm.rollResult {
-                RollOverlayView(
-                    rollValue: roll,
-                    label: vm.rollLabel,
-                    labelColor: vm.rollColor
-                )
-                .allowsHitTesting(false)
-                .transition(.scale.combined(with: .opacity))
-            }
+            .frame(width: geo.size.width, height: geo.size.height)
         }
     }
 
-    // MARK: - Opponent Zone (top edge)
+    // MARK: - Left Column (Player)
 
-    private var opponentZone: some View {
-        HStack {
-            // Face-down cards fanned at top (decorative opponent hand)
-            HStack(spacing: -14) {
-                ForEach(0..<4, id: \.self) { i in
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(
-                            LinearGradient(
-                                colors: [GameTheme.stoneGray, GameTheme.stoneDark],
-                                startPoint: .top, endPoint: .bottom
-                            )
-                        )
-                        .frame(width: 28, height: 38)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 4)
-                                .stroke(GameTheme.gold.opacity(0.15), lineWidth: 0.5)
-                        )
-                        .rotationEffect(.degrees(Double(i - 2) * 4))
-                        .shadow(color: .black.opacity(0.3), radius: 2, y: 1)
-                }
-            }
-            .padding(.leading, 24)
+    private var leftColumn: some View {
+        VStack(spacing: 8) {
+            // Player avatar
+            Circle()
+                .fill(Color.gray.opacity(0.3))
+                .frame(width: 80, height: 80)
+                .overlay(
+                    Image(systemName: "person.fill")
+                        .font(.system(size: 30))
+                        .foregroundColor(GameTheme.gold)
+                )
+                .overlay(
+                    Circle().stroke(GameTheme.gold.opacity(0.4), lineWidth: 2)
+                )
+
+            // Player name
+            Text(vm.championName)
+                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+                .lineLimit(1)
+
+            // HP bar
+            HPBarView(current: vm.playerHP, max: vm.playerMaxHP, height: 12)
+                .frame(width: 100)
+
+            // HP number
+            Text("\(vm.playerHP) HP")
+                .font(.system(size: 10, weight: .heavy, design: .rounded))
+                .foregroundColor(GameTheme.hpGreen)
 
             Spacer()
 
-            // Deck icon (top-right)
+            // Resource counter
             HStack(spacing: 4) {
-                ZStack {
-                    // Stacked card backs
-                    ForEach(0..<3, id: \.self) { i in
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(GameTheme.stoneDark)
-                            .frame(width: 22, height: 30)
-                            .offset(x: CGFloat(i) * 1.5, y: CGFloat(-i) * 1.5)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 3)
-                                    .stroke(GameTheme.gold.opacity(0.1), lineWidth: 0.5)
-                                    .offset(x: CGFloat(i) * 1.5, y: CGFloat(-i) * 1.5)
-                            )
-                    }
-                }
-                Text("\(vm.deckCount)")
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
-                    .foregroundColor(.white.opacity(0.5))
+                Text("🪙")
+                    .font(.system(size: 14))
+                Text("\(vm.playerResources)")
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundColor(GameTheme.gold)
             }
-            .padding(.trailing, 24)
-        }
-    }
 
-    // MARK: - Center Battlefield
-
-    private var centerBattlefield: some View {
-        HStack(spacing: 0) {
-            // Left-center: Treasure Chest
-            VStack(spacing: 10) {
-                Spacer()
-
-                // Chest card (large, upright)
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(
-                            LinearGradient(
-                                colors: [GameTheme.surfaceDark, GameTheme.cardBackground],
-                                startPoint: .top, endPoint: .bottom
-                            )
-                        )
-                        .frame(width: 140, height: 180)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(GameTheme.gold.opacity(0.3), lineWidth: 1.5)
-                        )
-                        .shadow(color: GameTheme.gold.opacity(0.15), radius: 12)
-                        .shadow(color: .black.opacity(0.4), radius: 6, y: 4)
-
-                    VStack(spacing: 10) {
-                        Image(systemName: "shippingbox.fill")
-                            .font(.system(size: 44))
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [GameTheme.gold, GameTheme.darkGold],
-                                    startPoint: .top, endPoint: .bottom
-                                )
-                            )
-                            .shadow(color: GameTheme.gold.opacity(0.3), radius: 8)
-
-                        Text("Treasure Chest")
-                            .font(.system(size: 14, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
-
-                        Text("Tier \(vm.chest?.tier ?? 1)")
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundColor(GameTheme.gold.opacity(0.7))
-                    }
-                }
-
-                // Chest HP bar
-                HPBarView(
-                    current: vm.chestHP,
-                    max: vm.chestMaxIntegrity,
-                    height: 14,
-                    showCracks: true
-                )
-                .frame(width: 140)
-
-                // ROLL button
-                Button(action: { vm.rollForChest() }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "dice.fill")
-                            .font(.system(size: 16))
-                        Text("ROLL")
-                            .font(.system(size: 16, weight: .heavy, design: .rounded))
-                    }
+            // END TURN button
+            Button(action: { vm.endTurn() }) {
+                Text("END TURN")
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
                     .foregroundColor(GameTheme.darkNavy)
-                    .padding(.horizontal, 32)
+                    .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
-                    .background(
-                        LinearGradient(
-                            colors: [GameTheme.gold, GameTheme.darkGold],
-                            startPoint: .leading, endPoint: .trailing
-                        )
-                    )
+                    .background(GameTheme.gold)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .shadow(color: GameTheme.gold.opacity(0.4), radius: 8)
-                }
-                .disabled(vm.chestDestroyed)
-                .opacity(vm.chestDestroyed ? 0.4 : 1.0)
-
-                Spacer()
             }
-            .frame(maxWidth: .infinity)
-
-            // Right-center: Gear slots + adventures area
-            VStack(spacing: 16) {
-                Spacer()
-
-                // Active gear display
-                VStack(spacing: 6) {
-                    Text("GEAR")
-                        .font(.system(size: 9, weight: .heavy, design: .rounded))
-                        .foregroundColor(.white.opacity(0.3))
-                        .tracking(2)
-                    GearSlotsView(gear: vm.activeGear, compact: false)
-                }
-
-                Spacer()
-            }
-            .frame(width: 200)
         }
-        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
     }
 
-    // MARK: - Player Zone (bottom)
+    // MARK: - Center Column (Battlefield)
 
-    private var playerZone: some View {
-        VStack(spacing: 6) {
-            // Fanned hand along bottom edge
-            FannedHandView(
-                cards: vm.hand,
-                selectedCardID: vm.selectedCardID,
-                playerResources: vm.playerResources,
-                onTapCard: { card in vm.selectCard(card) }
-            )
-            .frame(height: 140)
+    private var centerColumn: some View {
+        VStack(spacing: 8) {
+            // YOUR TURN pill
+            Text("YOUR TURN")
+                .font(.system(size: 10, weight: .black, design: .rounded))
+                .tracking(1)
+                .foregroundColor(GameTheme.darkNavy)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 4)
+                .background(GameTheme.gold)
+                .clipShape(Capsule())
 
-            // Bottom HUD bar
-            HStack(spacing: 12) {
-                // Champion portrait (bottom-left)
-                ChampionPortraitView(
-                    name: vm.championName,
-                    currentHP: vm.playerHP,
-                    maxHP: vm.playerMaxHP,
-                    accentColor: GameTheme.gold,
-                    label: "YOU"
-                )
+            Spacer()
 
-                Spacer()
+            // Treasure Chest card
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(GameTheme.darkNavy)
+                    .frame(width: 140, height: 180)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(GameTheme.gold, lineWidth: 2)
+                    )
 
-                // Mana crystals
-                ManaCrystalBar(
-                    available: vm.playerResources,
-                    total: vm.playerResources,
-                    pulse: vm.resourcePulse
-                )
-
-                // END TURN button (Hearthstone-style)
-                Button(action: { vm.endTurn() }) {
-                    Text("END TURN")
-                        .font(.system(size: 13, weight: .black, design: .rounded))
-                        .foregroundColor(GameTheme.darkNavy)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(
-                            LinearGradient(
-                                colors: [GameTheme.hpGreen, GameTheme.hpGreen.opacity(0.7)],
-                                startPoint: .top, endPoint: .bottom
-                            )
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                        .shadow(
-                            color: GameTheme.hpGreen.opacity(endTurnGlow ? 0.6 : 0.2),
-                            radius: endTurnGlow ? 10 : 4
-                        )
+                VStack(spacing: 8) {
+                    Text("📦")
+                        .font(.system(size: 36))
+                    Text("Treasure Chest")
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                    Text("Tier \(vm.chest?.tier ?? 1)")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(GameTheme.gold.opacity(0.7))
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 8)
+
+            // Chest HP bar
+            HPBarView(
+                current: vm.chestHP,
+                max: vm.chestMaxIntegrity,
+                height: 12,
+                showCracks: true
+            )
+            .frame(width: 160)
+
+            // Chest HP fraction
+            Text("\(vm.chestHP)/\(vm.chestMaxIntegrity)")
+                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .foregroundColor(.white.opacity(0.6))
+
+            // ROLL button
+            Button(action: { vm.rollForChest() }) {
+                Text("ROLL")
+                    .font(.system(size: 16, weight: .heavy, design: .rounded))
+                    .foregroundColor(GameTheme.darkNavy)
+                    .frame(width: 160)
+                    .padding(.vertical, 10)
+                    .background(GameTheme.gold)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            .disabled(vm.chestDestroyed)
+            .opacity(vm.chestDestroyed ? 0.4 : 1.0)
+
+            Spacer()
+
+            // Player hand
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(vm.hand) { card in
+                        CardView(
+                            card: card,
+                            isSelected: vm.selectedCardID == card.id,
+                            isAffordable: card.resourceCost <= vm.playerResources
+                        )
+                        .onTapGesture { vm.selectCard(card) }
+                    }
+                }
+                .padding(.horizontal, 8)
+            }
+            .frame(height: 106)
         }
-        .onAppear {
-            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                endTurnGlow = true
+        .padding(.vertical, 8)
+    }
+
+    // MARK: - Right Column (AI / Opponent)
+
+    private var rightColumn: some View {
+        VStack(spacing: 8) {
+            // AI avatar
+            Circle()
+                .fill(Color.gray.opacity(0.3))
+                .frame(width: 80, height: 80)
+                .overlay(
+                    Image(systemName: "person.fill")
+                        .font(.system(size: 30))
+                        .foregroundColor(GameTheme.hpRed)
+                )
+                .overlay(
+                    Circle().stroke(GameTheme.hpRed.opacity(0.4), lineWidth: 2)
+                )
+
+            // AI name
+            Text(vm.aiName)
+                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+                .lineLimit(1)
+
+            // AI HP bar
+            HPBarView(current: vm.aiHP, max: vm.aiMaxHP, height: 12)
+                .frame(width: 100)
+
+            // AI HP number
+            Text("\(vm.aiHP) HP")
+                .font(.system(size: 10, weight: .heavy, design: .rounded))
+                .foregroundColor(GameTheme.hpRed)
+
+            Spacer()
+
+            // GEAR label
+            Text("GEAR")
+                .font(.system(size: 9, weight: .heavy, design: .rounded))
+                .foregroundColor(.white.opacity(0.3))
+                .tracking(2)
+
+            // Gear slots vertical
+            VStack(spacing: 4) {
+                gearSlotRow(.head)
+                gearSlotRow(.chest)
+                gearSlotRow(.hands)
+                gearSlotRow(.feet)
+                gearSlotRow(.weapon)
             }
         }
+        .padding(.vertical, 12)
+    }
+
+    // MARK: - Gear Slot Helper
+
+    private func gearSlotRow(_ slot: GearSlot) -> some View {
+        let equipped = vm.activeGear.card(in: slot)
+        return RoundedRectangle(cornerRadius: 4)
+            .fill(equipped != nil ? GameTheme.cardBackground : Color.gray.opacity(0.15))
+            .frame(width: 28, height: 28)
+            .overlay(
+                RoundedRectangle(cornerRadius: 4)
+                    .stroke(
+                        equipped != nil ? GameTheme.rarityColor(equipped!.rarity) : Color.white.opacity(0.1),
+                        lineWidth: 1
+                    )
+            )
     }
 }

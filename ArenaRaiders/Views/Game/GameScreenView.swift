@@ -10,21 +10,23 @@ struct GameScreenView: View {
 
     var body: some View {
         ZStack {
-            // Textured game board background
-            GameBoardBackground()
+            // LAYER 1 - Background gradient
+            LinearGradient(
+                colors: [
+                    Color(red: 15/255, green: 23/255, blue: 42/255),
+                    Color(red: 30/255, green: 41/255, blue: 59/255)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                // Turn indicator pill (top center)
-                TurnBanner(isPlayerTurn: true)
-                    .padding(.top, 6)
-
-                // Phase content
-                switch vm.phase {
-                case .raid:
-                    RaidPhaseView(vm: vm)
-                case .arena:
-                    ArenaPhaseView(vm: vm)
-                }
+            // Phase content
+            switch vm.phase {
+            case .raid:
+                RaidPhaseView(vm: vm)
+            case .arena:
+                ArenaPhaseView(vm: vm)
             }
 
             // Game over overlay
@@ -45,7 +47,6 @@ struct GameScreenView: View {
                 Image(systemName: "trophy.fill")
                     .font(.system(size: 60))
                     .foregroundColor(GameTheme.gold)
-                    .shadow(color: GameTheme.gold.opacity(0.5), radius: 16)
 
                 Text("VICTORY")
                     .font(.system(size: 36, weight: .black, design: .rounded))
@@ -63,7 +64,6 @@ struct GameScreenView: View {
                         .padding(.vertical, 14)
                         .background(GameTheme.gold)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .shadow(color: GameTheme.gold.opacity(0.4), radius: 8)
                 }
                 .padding(.top, 8)
             }
