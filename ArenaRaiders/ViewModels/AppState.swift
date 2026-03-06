@@ -28,7 +28,7 @@ enum Tab: String, CaseIterable {
     }
 }
 
-@Observable
+@MainActor @Observable
 final class AppState {
     var currentScreen: Screen = .splash
     var selectedTab: Tab = .play
