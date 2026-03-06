@@ -145,8 +145,13 @@ final class GameViewModelTests: XCTestCase {
         vm.rollForChest()
         XCTAssertEqual(vm.playerResources, GameSession.startingResources + 1) // 3 + 1 = 4
 
+        // Play a card so hand drops below max (5) and drawCard can work
+        let card = vm.hand[0]
+        vm.playSelectedCard(card)
+        let handBefore = vm.hand.count // 4
+        XCTAssertEqual(handBefore, 4)
+
         // endTurn clears resources to 0, then adds startingResources (3) back
-        let handBefore = vm.hand.count
         vm.endTurn()
 
         // Resources reset to 0, then +3 starting resources added
@@ -155,7 +160,7 @@ final class GameViewModelTests: XCTestCase {
         // Turn incremented
         XCTAssertEqual(vm.session.currentTurn, 2)
 
-        // A card was drawn
+        // A card was drawn (hand had room since we played one)
         XCTAssertEqual(vm.hand.count, handBefore + 1)
     }
 
