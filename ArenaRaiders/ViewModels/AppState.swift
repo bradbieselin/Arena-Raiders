@@ -47,7 +47,10 @@ final class AppState {
         navigateTo(.game)
     }
 
-    func endGame() {
+    func endGame(didWin: Bool? = nil, context: ModelContext? = nil) {
+        if let didWin, let context {
+            SaveSystem.recordGameResult(didWin: didWin, context: context)
+        }
         gameSession = nil
         navigateTo(.main)
     }

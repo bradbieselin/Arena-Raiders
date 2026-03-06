@@ -43,6 +43,8 @@
 		A10000010000000000000067 /* RaidPhaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000067; };
 		A10000010000000000000068 /* ArenaPhaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000068; };
 		A10000010000000000000069 /* GameScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000069; };
+		A10000010000000000000080 /* SaveSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000080; };
+		A10000010000000000000081 /* DeckBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000081; };
 		A10000010000000000000050 /* ModelValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000050; };
 		A10000010000000000000051 /* EnumsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000051; };
 		A10000010000000000000052 /* GameEffectHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000052; };
@@ -109,6 +111,8 @@
 		A20000010000000000000067 /* RaidPhaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaidPhaseView.swift; sourceTree = "<group>"; };
 		A20000010000000000000068 /* ArenaPhaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArenaPhaseView.swift; sourceTree = "<group>"; };
 		A20000010000000000000069 /* GameScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScreenView.swift; sourceTree = "<group>"; };
+		A20000010000000000000080 /* SaveSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSystem.swift; sourceTree = "<group>"; };
+		A20000010000000000000081 /* DeckBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckBuilderView.swift; sourceTree = "<group>"; };
 		A20000010000000000000070 /* RollDistributionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollDistributionTests.swift; sourceTree = "<group>"; };
 		A20000010000000000000071 /* ResourceEconomyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceEconomyTests.swift; sourceTree = "<group>"; };
 		A20000010000000000000072 /* GearSlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GearSlotTests.swift; sourceTree = "<group>"; };
@@ -209,6 +213,7 @@
 				A20000010000000000000012 /* CollectionView.swift */,
 				A20000010000000000000013 /* ShopView.swift */,
 				A20000010000000000000014 /* ProfileView.swift */,
+				A20000010000000000000081 /* DeckBuilderView.swift */,
 				A40000010000000000000011 /* Game */,
 			);
 			path = Views;
@@ -254,6 +259,7 @@
 			children = (
 				A20000010000000000000016 /* DataManager.swift */,
 				A20000010000000000000041 /* StarterDataLoader.swift */,
+				A20000010000000000000080 /* SaveSystem.swift */,
 				A20000010000000000000042 /* arena_raiders_starter_data.json */,
 			);
 			path = Data;
@@ -418,6 +424,8 @@
 				A10000010000000000000067 /* RaidPhaseView.swift in Sources */,
 				A10000010000000000000068 /* ArenaPhaseView.swift in Sources */,
 				A10000010000000000000069 /* GameScreenView.swift in Sources */,
+				A10000010000000000000080 /* SaveSystem.swift in Sources */,
+				A10000010000000000000081 /* DeckBuilderView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
