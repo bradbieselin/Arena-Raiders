@@ -27,7 +27,7 @@ struct HPBarView: View {
                 // Fill
                 RoundedRectangle(cornerRadius: height / 2)
                     .fill(barColor)
-                    .frame(width: max(0, geo.size.width * fraction))
+                    .frame(width: Swift.max(0, geo.size.width * fraction))
                     .animation(.easeInOut(duration: 0.3), value: current)
 
                 // Crack overlay for chests
