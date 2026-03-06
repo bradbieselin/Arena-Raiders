@@ -332,6 +332,12 @@ final class GameEngine {
             )
         case .abilityPerfectDodge:
             session.perfectDodgeUsed = true
+        case .abilityBackstab:
+            // Sabotage: opponent weapon -1 durability
+            applyGearDurabilityLoss(slot: .weapon, amount: 1, session: &session)
+        case .abilityGearCrush:
+            // Sabotage: target gear -2 durability (defaults to weapon slot)
+            applyGearDurabilityLoss(slot: .weapon, amount: 2, session: &session)
         default:
             break // Other abilities resolved by caller
         }
