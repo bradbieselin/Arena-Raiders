@@ -61,6 +61,7 @@
 		A10000010000000000000074 /* PhaseProgressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000074; };
 		A10000010000000000000075 /* ArenaCombatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000075; };
 		A10000010000000000000076 /* GameSimulationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000076; };
+		A10000010000000000000082 /* GameViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000082; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -120,6 +121,7 @@
 		A20000010000000000000074 /* PhaseProgressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhaseProgressionTests.swift; sourceTree = "<group>"; };
 		A20000010000000000000075 /* ArenaCombatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArenaCombatTests.swift; sourceTree = "<group>"; };
 		A20000010000000000000076 /* GameSimulationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSimulationTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000082 /* GameViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -170,6 +172,7 @@
 				A20000010000000000000074 /* PhaseProgressionTests.swift */,
 				A20000010000000000000075 /* ArenaCombatTests.swift */,
 				A20000010000000000000076 /* GameSimulationTests.swift */,
+				A20000010000000000000082 /* GameViewModelTests.swift */,
 			);
 			path = ArenaRaidersTests;
 			sourceTree = "<group>";
@@ -451,6 +454,7 @@
 				A10000010000000000000074 /* PhaseProgressionTests.swift in Sources */,
 				A10000010000000000000075 /* ArenaCombatTests.swift in Sources */,
 				A10000010000000000000076 /* GameSimulationTests.swift in Sources */,
+				A10000010000000000000082 /* GameViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

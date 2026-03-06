@@ -36,9 +36,9 @@ final class GameViewModel {
 
     // MARK: - Init
 
-    init(session: GameSession) {
+    init(session: GameSession, engine: GameEngine = GameEngine()) {
         self.session = session
-        self.engine = GameEngine()
+        self.engine = engine
         self.ai = AIOpponent(engine: engine)
 
         engine.setupGame(session: &self.session)
