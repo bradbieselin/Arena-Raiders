@@ -457,15 +457,16 @@ final class GameEngineTests: XCTestCase {
         XCTAssertEqual(deck.count, 1)
     }
 
-    func testDrawCardRespectsHandSize() {
+    func testDrawCardAlwaysDrawsRegardlessOfHandSize() {
         let engine = GameEngine()
         var deck = [makeCard(name: "Card A")]
         var hand = (0..<5).map { makeCard(name: "Hand \($0)") }
 
-        engine.drawCard(deck: &deck, hand: &hand, handSize: 5)
+        // drawCard no longer blocks on hand size — hand limit is enforced at end of turn
+        engine.drawCard(deck: &deck, hand: &hand)
 
-        XCTAssertEqual(hand.count, 5)
-        XCTAssertEqual(deck.count, 1)
+        XCTAssertEqual(hand.count, 6)
+        XCTAssertEqual(deck.count, 0)
     }
 
     func testDrawCardFromEmptyDeck() {

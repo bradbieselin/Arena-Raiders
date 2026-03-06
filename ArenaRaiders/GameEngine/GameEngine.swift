@@ -310,8 +310,7 @@ final class GameEngine {
             session.playerHP = min(session.playerMaxHP, session.playerHP + 4)
         case .abilityBattleCry:
             session.playerResources += 3
-            drawCard(deck: &session.playerDeck, hand: &session.playerHand,
-                     handSize: session.effectiveHandSize)
+            drawCard(deck: &session.playerDeck, hand: &session.playerHand)
         case .abilitySecondWind:
             if session.playerHP < session.playerMaxHP / 2 {
                 session.playerHP = min(session.playerMaxHP, session.playerHP + 8)
@@ -452,8 +451,7 @@ final class GameEngine {
 
         switch effect {
         case .adventureLootRun:
-            drawCards(count: 2, deck: &session.playerDeck, hand: &session.playerHand,
-                      handSize: session.effectiveHandSize)
+            drawCards(count: 2, deck: &session.playerDeck, hand: &session.playerHand)
         case .adventureBountyHunt:
             session.playerResources += adventure.hitsDuringAdventure * 2
         case .adventureFieldMedicine:
@@ -470,10 +468,9 @@ final class GameEngine {
 
     func drawCard(
         deck: inout [CardReference],
-        hand: inout [CardReference],
-        handSize: Int = GameSession.defaultHandSize
+        hand: inout [CardReference]
     ) {
-        guard hand.count < handSize, !deck.isEmpty else { return }
+        guard !deck.isEmpty else { return }
         let drawn = deck.removeFirst()
         hand.append(drawn)
     }
@@ -481,13 +478,21 @@ final class GameEngine {
     func drawCards(
         count: Int,
         deck: inout [CardReference],
-        hand: inout [CardReference],
-        handSize: Int = GameSession.defaultHandSize
+        hand: inout [CardReference]
     ) {
         for _ in 0..<count {
-            guard hand.count < handSize, !deck.isEmpty else { break }
+            guard !deck.isEmpty else { break }
             let drawn = deck.removeFirst()
             hand.append(drawn)
+        }
+    }
+
+    /// Discards excess cards down to hand size limit (called at end of turn).
+    func enforceHandSize(session: inout GameSession) {
+        let limit = session.effectiveHandSize
+        while session.playerHand.count > limit {
+            let discarded = session.playerHand.removeLast()
+            session.playerDiscard.append(discarded)
         }
     }
 
@@ -516,18 +521,19 @@ final class GameEngine {
 
         session.currentTurn += 1
 
+        // Discard down to hand size limit
+        enforceHandSize(session: &session)
+
         // Draw a card for next turn
         drawCard(
             deck: &session.playerDeck,
-            hand: &session.playerHand,
-            handSize: session.effectiveHandSize
+            hand: &session.playerHand
         )
 
         // Crown of Clarity: draw 1 extra
         if let head = session.activeGear.card(in: .head),
            GameEffectHandler.forCard(head.stringId) == .headAvoidance2DrawExtra {
-            drawCard(deck: &session.playerDeck, hand: &session.playerHand,
-                     handSize: session.effectiveHandSize + 1) // bonus draw ignores hand size
+            drawCard(deck: &session.playerDeck, hand: &session.playerHand)
         }
 
         // Holy Mending: heal 1 at start of raid turn
