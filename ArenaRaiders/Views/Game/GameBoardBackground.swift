@@ -2,6 +2,21 @@ import SwiftUI
 
 /// Rich textured game board background — dark stone edges, felt center.
 struct GameBoardBackground: View {
+    private struct NoiseCircle {
+        let size: CGFloat
+        let x: CGFloat
+        let y: CGFloat
+    }
+
+    private let noiseCircles: [NoiseCircle] = [
+        NoiseCircle(size: 80,  x: -60, y: 40),
+        NoiseCircle(size: 120, x: 100, y: -60),
+        NoiseCircle(size: 160, x: -30, y: 80),
+        NoiseCircle(size: 200, x: 70,  y: -20),
+        NoiseCircle(size: 240, x: -90, y: -50),
+        NoiseCircle(size: 280, x: 50,  y: 30),
+    ]
+
     var body: some View {
         GeometryReader { geo in
             ZStack {
@@ -45,17 +60,12 @@ struct GameBoardBackground: View {
                     .frame(width: geo.size.width * 0.7, height: geo.size.height * 0.6)
 
                 // Subtle noise texture using overlapping shapes
-                ForEach(0..<6, id: \.self) { i in
+                ForEach(0..<noiseCircles.count, id: \.self) { i in
+                    let nc = noiseCircles[i]
                     Circle()
                         .fill(Color.white.opacity(0.008))
-                        .frame(
-                            width: CGFloat(80 + i * 40),
-                            height: CGFloat(80 + i * 40)
-                        )
-                        .offset(
-                            x: CGFloat([-60, 100, -30, 70, -90, 50][i]),
-                            y: CGFloat([40, -60, 80, -20, -50, 30][i])
-                        )
+                        .frame(width: nc.size, height: nc.size)
+                        .offset(x: nc.x, y: nc.y)
                 }
 
                 // Gold trim line across center (dividing player zones)

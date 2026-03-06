@@ -18,7 +18,9 @@ struct FannedHandView: View {
 
     var body: some View {
         HStack(spacing: -cardOverlap) {
-            ForEach(Array(cards.enumerated()), id: \.element.id) { index, card in
+            ForEach(Array(cards.enumerated()), id: \.element.id) { pair in
+                let index = pair.offset
+                let card = pair.element
                 let isSelected = selectedCardID == card.id
                 let isAffordable = card.resourceCost <= playerResources
                 let angle = fanAngle(index: index, total: cards.count)

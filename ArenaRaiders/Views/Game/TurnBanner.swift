@@ -6,6 +6,24 @@ struct TurnBanner: View {
 
     @State private var glow: Bool = false
 
+    private var fillGradient: LinearGradient {
+        if isPlayerTurn {
+            return LinearGradient(
+                colors: [GameTheme.gold, GameTheme.darkGold],
+                startPoint: .leading, endPoint: .trailing
+            )
+        } else {
+            return LinearGradient(
+                colors: [GameTheme.stoneGray, GameTheme.stoneDark],
+                startPoint: .leading, endPoint: .trailing
+            )
+        }
+    }
+
+    private var strokeColor: Color {
+        isPlayerTurn ? GameTheme.gold.opacity(0.8) : Color.white.opacity(0.1)
+    }
+
     var body: some View {
         Text(isPlayerTurn ? "YOUR TURN" : "OPPONENT'S TURN")
             .font(.system(size: 11, weight: .black, design: .rounded))
@@ -14,25 +32,10 @@ struct TurnBanner: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 6)
             .background(
-                Capsule()
-                    .fill(
-                        isPlayerTurn
-                            ? LinearGradient(
-                                colors: [GameTheme.gold, GameTheme.darkGold],
-                                startPoint: .leading, endPoint: .trailing
-                            )
-                            : LinearGradient(
-                                colors: [GameTheme.stoneGray, GameTheme.stoneDark],
-                                startPoint: .leading, endPoint: .trailing
-                            )
-                    )
+                Capsule().fill(fillGradient)
             )
             .overlay(
-                Capsule()
-                    .stroke(
-                        isPlayerTurn ? GameTheme.gold.opacity(0.8) : Color.white.opacity(0.1),
-                        lineWidth: 1
-                    )
+                Capsule().stroke(strokeColor, lineWidth: 1)
             )
             .shadow(
                 color: isPlayerTurn ? GameTheme.gold.opacity(glow ? 0.6 : 0.2) : .clear,

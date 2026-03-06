@@ -83,14 +83,8 @@ struct CardView: View {
                     .frame(maxWidth: .infinity)
 
                 // Durability pips
-                if let dur = card.durability, let maxDur = card.maxDurability {
-                    HStack(spacing: 3) {
-                        ForEach(0..<maxDur, id: \.self) { i in
-                            Circle()
-                                .fill(i < dur ? GameTheme.gold : Color.white.opacity(0.15))
-                                .frame(width: 4, height: 4)
-                        }
-                    }
+                if let dur = card.durability, let maxDur = card.maxDurability, maxDur > 0 {
+                    durabilityPips(current: dur, max: maxDur)
                 }
 
                 // Type label
@@ -136,6 +130,16 @@ struct CardView: View {
                 withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
                     legendaryPulse = true
                 }
+            }
+        }
+    }
+
+    private func durabilityPips(current: Int, max: Int) -> some View {
+        HStack(spacing: 3) {
+            ForEach(0..<max, id: \.self) { i in
+                Circle()
+                    .fill(i < current ? GameTheme.gold : Color.white.opacity(0.15))
+                    .frame(width: 4, height: 4)
             }
         }
     }

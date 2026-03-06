@@ -122,11 +122,11 @@ struct ArenaPhaseView: View {
             Button(action: {
                 vm.attackOpponent()
                 // Trigger shake on AI portrait
-                withAnimation(.spring(response: 0.1, dampingFraction: 0.2).repeatCount(4)) {
+                withAnimation(.easeInOut(duration: 0.06).repeatCount(6, autoreverses: true)) {
                     aiShake = true
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    aiShake = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    withAnimation(.easeOut(duration: 0.1)) { aiShake = false }
                 }
             }) {
                 HStack(spacing: 10) {
