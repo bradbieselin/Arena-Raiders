@@ -22,9 +22,19 @@ final class GameViewModel {
     // Selection
     var selectedCardID: UUID?
 
+    // Pause menu
+    var isPaused: Bool = false
+
     // Game over
     var isGameOver: Bool = false
     var winnerName: String = ""
+    private(set) var didPlayerWin: Bool = false
+    private(set) var goldReward: Int = 0
+    private(set) var didRecordResult: Bool = false
+
+    // Arena turn state
+    private(set) var hasAttackedThisTurn: Bool = false
+    private(set) var damageDealtToOpponent: Int = 0
 
     // AI state (for arena)
     private(set) var aiState: AIState?
@@ -53,6 +63,9 @@ final class GameViewModel {
     var playerResources: Int { session.playerResources }
     var hand: [CardReference] { session.playerHand }
     var deckCount: Int { session.playerDeck.count }
+    var discardCount: Int { session.playerDiscard.count }
+    var currentTurn: Int { session.currentTurn }
+    var chestsBroken: Int { session.chestCount }
     var activeGear: ActiveGearMap { session.activeGear }
     var chestHP: Int { chest?.integrity ?? 0 }
     var chestDestroyed: Bool { chest?.isDestroyed ?? true }
@@ -66,10 +79,14 @@ final class GameViewModel {
         session.playerChampion?.name ?? "Champion"
     }
 
+    var opponentDisplayName: String {
+        aiState?.champion.name ?? "Treasure Vault"
+    }
+
     // MARK: - Raid Actions
 
     func rollForChest() {
-        guard let chest = chest, !chest.isDestroyed else { return }
+        guard !isGameOver, let chest = chest, !chest.isDestroyed else { return }
 
         let roll = engine.rollD20()
         let outcome = engine.resolveChestRoll(roll: roll, chest: chest, session: session)
@@ -85,12 +102,18 @@ final class GameViewModel {
         if outcome.result.isCrit {
             rollLabel = "CRIT!"
             rollColor = .red
+            SoundManager.shared.play(.crit)
+            HapticsManager.shared.trigger(.heavy)
         } else if outcome.result.isHit {
             rollLabel = "HIT"
             rollColor = .yellow
+            SoundManager.shared.play(.hit)
+            HapticsManager.shared.trigger(.medium)
         } else {
             rollLabel = "MISS"
             rollColor = .gray
+            SoundManager.shared.play(.miss)
+            HapticsManager.shared.trigger(.light)
         }
         showRoll = true
 
@@ -116,6 +139,7 @@ final class GameViewModel {
 
         // Check chest destroyed
         if chest.isDestroyed {
+            SoundManager.shared.play(.coin)
             engine.advanceChest(session: &session)
             if session.phase == .raid {
                 spawnChest()
@@ -132,24 +156,47 @@ final class GameViewModel {
             playSelectedCard(card)
         } else {
             selectedCardID = card.id
+            HapticsManager.shared.trigger(.selection)
         }
     }
 
     func playSelectedCard(_ card: CardReference) {
+        guard !isGameOver else { return }
         guard card.resourceCost <= session.playerResources else { return }
+        let handCountBefore = session.playerHand.count
         engine.playCard(card: card, session: &session)
         selectedCardID = nil
+        if session.playerHand.count < handCountBefore {
+            SoundManager.shared.play(.cardPlay)
+            HapticsManager.shared.trigger(.light)
+        }
     }
 
     func endTurn() {
-        engine.endTurn(session: &session)
+        guard !isGameOver else { return }
         selectedCardID = nil
+
+        // In the arena the opponent acts before the turn rolls over.
+        if session.phase == .arena {
+            aiTurn()
+            guard !isGameOver else { return }
+        }
+
+        engine.endTurn(session: &session)
+        hasAttackedThisTurn = false
+
+        // Status effects ticked in endTurn can be lethal.
+        if session.playerHP <= 0 {
+            finishGame(playerWon: false)
+        }
     }
 
     // MARK: - Arena Actions
 
     func attackOpponent() {
-        guard var ai = aiState, session.phase == .arena else { return }
+        guard session.phase == .arena, !isGameOver, !hasAttackedThisTurn,
+              var ai = aiState else { return }
+        hasAttackedThisTurn = true
 
         // Player attacks AI
         let roll = engine.rollD20()
@@ -174,6 +221,7 @@ final class GameViewModel {
 
         if attack.didHit {
             ai.hp -= attack.finalDamage
+            damageDealtToOpponent += attack.finalDamage
         }
 
         // Animate
@@ -181,12 +229,18 @@ final class GameViewModel {
         if result.isCrit {
             rollLabel = "CRIT!"
             rollColor = .red
+            SoundManager.shared.play(.crit)
+            HapticsManager.shared.trigger(.heavy)
         } else if attack.didHit {
             rollLabel = "HIT"
             rollColor = .yellow
+            SoundManager.shared.play(.hit)
+            HapticsManager.shared.trigger(.medium)
         } else {
             rollLabel = "MISS"
             rollColor = .gray
+            SoundManager.shared.play(.miss)
+            HapticsManager.shared.trigger(.light)
         }
         showRoll = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
@@ -197,14 +251,53 @@ final class GameViewModel {
 
         // Check AI defeated
         if ai.hp <= 0 {
-            isGameOver = true
-            winnerName = championName
-            return
+            finishGame(playerWon: true)
+        }
+    }
+
+    // MARK: - Game End
+
+    func concede() {
+        finishGame(playerWon: false, conceded: true)
+    }
+
+    func buildMatchRecord() -> MatchRecord {
+        MatchRecord(
+            didWin: didPlayerWin,
+            championName: championName,
+            opponentName: opponentDisplayName,
+            turnsPlayed: session.currentTurn,
+            chestsBroken: session.chestCount,
+            goldEarned: goldReward
+        )
+    }
+
+    /// Marks the result as persisted so it is recorded exactly once.
+    func markResultRecorded() {
+        didRecordResult = true
+    }
+
+    private func finishGame(playerWon: Bool, conceded: Bool = false) {
+        guard !isGameOver else { return }
+
+        didPlayerWin = playerWon
+        winnerName = playerWon ? championName : aiName
+        session.endedAt = Date()
+        session.didPlayerWin = playerWon
+
+        if conceded {
+            goldReward = 0
+        } else if playerWon {
+            goldReward = 25 + 5 * session.chestCount
+        } else {
+            goldReward = 5 + 2 * session.chestCount
         }
 
-        // AI counter-attacks after a delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
-            self?.aiTurn()
+        SoundManager.shared.play(playerWon ? .victory : .defeat)
+        HapticsManager.shared.trigger(playerWon ? .success : .error)
+
+        withAnimation(.easeInOut(duration: 0.3)) {
+            isGameOver = true
         }
     }
 
@@ -217,15 +310,26 @@ final class GameViewModel {
         chestMaxIntegrity = integrity
     }
 
+    /// AI opponents the player can face in the arena, mirroring the starter
+    /// roster. String ids are AI-specific so champion innates and tier
+    /// effects never apply to the scripted opponent.
+    private static let opponentRoster: [(name: String, archetype: Archetype, hp: Int, avoidance: Int, mitigation: Int, passive: String)] = [
+        ("Lyra Swiftblade", .rogue, 24, 16, 1, "First Blood"),
+        ("Vex the Ironclad", .warrior, 30, 12, 3, "Unyielding"),
+        ("Grizzak the Unbroken", .berserker, 35, 9, 0, "Blood Rage"),
+        ("Zara the Voidwalker", .shadow, 25, 14, 1, "Void Siphon")
+    ]
+
     private func setupArena() {
-        // Create AI opponent with a basic deck
-        let lyra = Champion(
-            stringId: "champ_002", name: "Lyra Swiftblade", archetype: .rogue,
-            hp: 24, avoidance: 16, mitigation: 1,
-            innatePassive: InnatePassive(name: "First Blood", effectDescription: "First Hit deals double"),
+        // Pick a random arena opponent
+        let pick = Self.opponentRoster.randomElement() ?? Self.opponentRoster[0]
+        let opponent = Champion(
+            stringId: "ai_opponent", name: pick.name, archetype: pick.archetype,
+            hp: pick.hp, avoidance: pick.avoidance, mitigation: pick.mitigation,
+            innatePassive: InnatePassive(name: pick.passive, effectDescription: pick.passive),
             tierEffects: []
         )
-        let lyraRef = ChampionReference(champion: lyra)
+        let opponentRef = ChampionReference(champion: opponent)
 
         // Simple AI deck
         var aiDeck: [CardReference] = []
@@ -246,16 +350,18 @@ final class GameViewModel {
         }
 
         aiState = AIState(
-            champion: lyraRef, hand: hand, deck: aiDeck,
+            champion: opponentRef, hand: hand, deck: aiDeck,
             resources: GameSession.startingResources,
-            hp: lyraRef.hp, activeGear: ActiveGearMap(), activeTalents: []
+            hp: opponentRef.hp, activeGear: ActiveGearMap(), activeTalents: []
         )
     }
 
     private func aiTurn() {
-        guard var ai = aiState else { return }
+        guard var ai = aiState, !isGameOver else { return }
 
-        // AI attacks player
+        // AI plays its cards first (equipping gear), then attacks
+        _ = self.ai.executeTurn(state: &ai)
+
         let aiRoll = engine.rollD20()
         var aiAtkBonus = 0
         if let weapon = ai.activeGear.card(in: .weapon),
@@ -277,18 +383,12 @@ final class GameViewModel {
             session.playerHP -= aiAttack.finalDamage
         }
 
-        // AI plays cards
-        _ = self.ai.executeTurn(state: &ai)
         ai.resources = GameSession.startingResources
         self.aiState = ai
 
-        // End player turn
-        engine.endTurn(session: &session)
-
         // Check player defeated
         if session.playerHP <= 0 {
-            isGameOver = true
-            winnerName = aiName
+            finishGame(playerWon: false)
         }
     }
 }

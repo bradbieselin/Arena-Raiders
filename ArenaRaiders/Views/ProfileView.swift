@@ -10,7 +10,8 @@ struct ProfileView: View {
     @State private var isEditingName = false
     @State private var editedName = ""
     @State private var showResetConfirm = false
-    @State private var audioEnabled = true
+    @State private var showHowToPlay = false
+    @Bindable private var settings = GameSettings.shared
 
     private var profile: PlayerProfile? { profiles.first }
 
@@ -24,7 +25,9 @@ struct ProfileView: View {
                         VStack(spacing: 24) {
                             avatarSection(profile)
                             statsGrid(profile)
+                            achievementsSection(profile)
                             championRoster(profile)
+                            matchHistorySection(profile)
                             settingsSection(profile)
                         }
                         .padding(.bottom, 40)
@@ -49,7 +52,10 @@ struct ProfileView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("This will reset your wins, losses, and currency. Your card collection and champions will be kept.")
+                Text("This will reset your wins, losses, streaks, match history, and currency. Your card collection and champions will be kept.")
+            }
+            .sheet(isPresented: $showHowToPlay) {
+                HowToPlayView()
             }
         }
     }
@@ -108,6 +114,9 @@ struct ProfileView: View {
             StatCard(title: "Wins", value: "\(profile.totalWins)", icon: "trophy.fill")
             StatCard(title: "Losses", value: "\(profile.totalLosses)", icon: "xmark.shield.fill")
             StatCard(title: "Games", value: "\(profile.totalGames)", icon: "gamecontroller.fill")
+            StatCard(title: "Streak", value: "\(profile.currentWinStreak)", icon: "flame.fill")
+            StatCard(title: "Best Streak", value: "\(profile.bestWinStreak)", icon: "bolt.fill")
+            StatCard(title: "Packs", value: "\(profile.packsOpened)", icon: "shippingbox.fill")
         }
         .padding(.horizontal)
 
@@ -132,6 +141,142 @@ struct ProfileView: View {
             }
             .padding(.horizontal)
         }
+    }
+
+    // MARK: - Achievements
+
+    @ViewBuilder
+    private func achievementsSection(_ profile: PlayerProfile) -> some View {
+        let progressList = Achievements.progress(for: profile)
+        let unlockedCount = progressList.filter(\.isUnlocked).count
+
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("ACHIEVEMENTS")
+                    .font(.caption.bold())
+                    .foregroundColor(GameTheme.gold)
+
+                Spacer()
+
+                Text("\(unlockedCount)/\(progressList.count)")
+                    .font(.caption.bold())
+                    .foregroundColor(.white.opacity(0.5))
+            }
+            .padding(.horizontal)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(progressList) { progress in
+                        achievementBadge(progress)
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func achievementBadge(_ progress: AchievementProgress) -> some View {
+        VStack(spacing: 6) {
+            ZStack {
+                Circle()
+                    .fill(progress.isUnlocked ? GameTheme.gold.opacity(0.18) : Color.white.opacity(0.05))
+                    .frame(width: 54, height: 54)
+
+                Circle()
+                    .trim(from: 0, to: progress.fraction)
+                    .stroke(
+                        progress.isUnlocked ? GameTheme.gold : GameTheme.gold.opacity(0.4),
+                        style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                    )
+                    .rotationEffect(.degrees(-90))
+                    .frame(width: 54, height: 54)
+
+                Image(systemName: progress.achievement.icon)
+                    .font(.system(size: 20))
+                    .foregroundColor(progress.isUnlocked ? GameTheme.gold : .gray.opacity(0.6))
+            }
+
+            Text(progress.achievement.title)
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundColor(progress.isUnlocked ? .white : .gray)
+                .lineLimit(1)
+
+            Text(progress.isUnlocked ? "Done!" : "\(progress.current)/\(progress.achievement.target)")
+                .font(.system(size: 8, weight: .medium))
+                .foregroundColor(progress.isUnlocked ? GameTheme.hpGreen : .gray.opacity(0.7))
+        }
+        .frame(width: 76)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(
+            "\(progress.achievement.title): \(progress.achievement.detail). " +
+            (progress.isUnlocked ? "Unlocked" : "\(progress.current) of \(progress.achievement.target)")
+        )
+    }
+
+    // MARK: - Match History
+
+    @ViewBuilder
+    private func matchHistorySection(_ profile: PlayerProfile) -> some View {
+        if !profile.matchHistory.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("RECENT MATCHES")
+                    .font(.caption.bold())
+                    .foregroundColor(GameTheme.gold)
+                    .padding(.horizontal)
+
+                VStack(spacing: 1) {
+                    ForEach(profile.matchHistory.prefix(10)) { match in
+                        matchRow(match)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func matchRow(_ match: MatchRecord) -> some View {
+        HStack(spacing: 10) {
+            Text(match.didWin ? "WIN" : "LOSS")
+                .font(.system(size: 10, weight: .heavy))
+                .foregroundColor(match.didWin ? GameTheme.hpGreen : GameTheme.hpRed)
+                .frame(width: 38)
+                .padding(.vertical, 4)
+                .background((match.didWin ? GameTheme.hpGreen : GameTheme.hpRed).opacity(0.15))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(match.championName) vs \(match.opponentName)")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+
+                Text("\(match.turnsPlayed) turns • \(match.chestsBroken) chests")
+                    .font(.system(size: 11))
+                    .foregroundColor(.gray)
+            }
+
+            Spacer()
+
+            VStack(alignment: .trailing, spacing: 2) {
+                if match.goldEarned > 0 {
+                    Text("+\(match.goldEarned)")
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .foregroundColor(GameTheme.gold)
+                }
+
+                Text(match.date, format: .relative(presentation: .named))
+                    .font(.system(size: 10))
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 10)
+        .background(Color.white.opacity(0.05))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(
+            "\(match.didWin ? "Won" : "Lost") against \(match.opponentName), earned \(match.goldEarned) gold"
+        )
     }
 
     // MARK: - Champion Roster
@@ -230,12 +375,33 @@ struct ProfileView: View {
                     }
                 }
 
-                // Audio toggle
-                settingsRow(icon: audioEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill",
-                            title: "Audio") {
-                    Toggle("", isOn: $audioEnabled)
+                // Sound toggle (persisted)
+                settingsRow(icon: settings.soundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill",
+                            title: "Sound Effects") {
+                    Toggle("Sound Effects", isOn: $settings.soundEnabled)
                         .labelsHidden()
                         .tint(GameTheme.gold)
+                }
+
+                // Haptics toggle (persisted)
+                settingsRow(icon: "iphone.radiowaves.left.and.right",
+                            title: "Haptics") {
+                    Toggle("Haptics", isOn: $settings.hapticsEnabled)
+                        .labelsHidden()
+                        .tint(GameTheme.gold)
+                }
+
+                // How to Play
+                settingsRow(icon: "questionmark.circle.fill", title: "How to Play") {
+                    Button("View") {
+                        showHowToPlay = true
+                    }
+                    .font(.caption.bold())
+                    .foregroundColor(GameTheme.gold)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(GameTheme.gold.opacity(0.15))
+                    .clipShape(Capsule())
                 }
 
                 // Reset Progress
@@ -249,6 +415,13 @@ struct ProfileView: View {
                     .padding(.vertical, 6)
                     .background(GameTheme.hpRed.opacity(0.15))
                     .clipShape(Capsule())
+                }
+
+                // App version
+                settingsRow(icon: "info.circle.fill", title: "Version") {
+                    Text(GameSettings.appVersion)
+                        .font(.caption)
+                        .foregroundColor(.gray)
                 }
             }
         }

@@ -64,7 +64,13 @@ struct CardReference: Codable, Equatable, Hashable, Identifiable {
     let turnsToComplete: Int?
 
     init(card: Card) {
-        self.id = card.id
+        self.init(card: card, copyId: card.id)
+    }
+
+    /// Creates a snapshot with an explicit identity, so multiple copies of the
+    /// same catalog card can coexist in a deck or hand as distinct instances.
+    init(card: Card, copyId: UUID) {
+        self.id = copyId
         self.stringId = card.stringId
         self.name = card.name
         self.cardType = card.cardType

@@ -19,6 +19,38 @@ struct OwnedCardEntry: Codable, Equatable, Hashable, Identifiable {
     }
 }
 
+// MARK: - Match Record (one entry per completed game)
+
+struct MatchRecord: Codable, Equatable, Hashable, Identifiable {
+    let id: UUID
+    let date: Date
+    let didWin: Bool
+    let championName: String
+    let opponentName: String
+    let turnsPlayed: Int
+    let chestsBroken: Int
+    let goldEarned: Int
+
+    init(
+        didWin: Bool,
+        championName: String,
+        opponentName: String,
+        turnsPlayed: Int,
+        chestsBroken: Int,
+        goldEarned: Int,
+        date: Date = Date()
+    ) {
+        self.id = UUID()
+        self.date = date
+        self.didWin = didWin
+        self.championName = championName
+        self.opponentName = opponentName
+        self.turnsPlayed = turnsPlayed
+        self.chestsBroken = chestsBroken
+        self.goldEarned = goldEarned
+    }
+}
+
 // MARK: - Player Profile
 
 @Model
@@ -31,6 +63,15 @@ final class PlayerProfile {
     var hasRemovedAds: Bool
     var createdAt: Date
     var hasCompletedFirstLaunch: Bool
+
+    // Meta progression
+    var currentWinStreak: Int = 0
+    var bestWinStreak: Int = 0
+    var packsOpened: Int = 0
+    var lastDailyBonusClaim: Date?
+
+    // Recent match results (newest first, capped by SaveSystem)
+    var matchHistory: [MatchRecord] = []
 
     // Card collection stored as Codable array with quantities
     var cardCollection: [OwnedCardEntry]
@@ -53,6 +94,11 @@ final class PlayerProfile {
         self.hasRemovedAds = false
         self.createdAt = Date()
         self.hasCompletedFirstLaunch = false
+        self.currentWinStreak = 0
+        self.bestWinStreak = 0
+        self.packsOpened = 0
+        self.lastDailyBonusClaim = nil
+        self.matchHistory = []
         self.cardCollection = []
         self.unlockedChampions = []
         self.savedDecks = []

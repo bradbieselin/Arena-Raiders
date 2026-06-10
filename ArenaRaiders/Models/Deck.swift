@@ -50,3 +50,27 @@ final class Deck {
         cardSlots.count
     }
 }
+
+// MARK: - Materialization (deck slots → playable card snapshots)
+
+extension Deck {
+    /// Expands the deck's card slots into playable `CardReference` snapshots
+    /// using the full card catalog. Each copy gets a unique identity so the
+    /// game can track duplicates independently. Slots referencing unknown
+    /// cards are skipped.
+    func materializedCards(from catalog: [Card]) -> [CardReference] {
+        let cardsById = Dictionary(
+            catalog.map { ($0.stringId, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+
+        var references: [CardReference] = []
+        for slot in cardSlots {
+            guard let card = cardsById[slot.cardStringId] else { continue }
+            for _ in 0..<max(0, slot.quantity) {
+                references.append(CardReference(card: card, copyId: UUID()))
+            }
+        }
+        return references
+    }
+}

@@ -116,7 +116,7 @@ struct ArenaPhaseView: View {
                 .font(.system(size: 28, weight: .black, design: .rounded))
                 .foregroundColor(GameTheme.hpRed)
 
-            // ATTACK button
+            // ATTACK button (one attack per turn)
             Button(action: {
                 vm.attackOpponent()
                 withAnimation(.easeInOut(duration: 0.06).repeatCount(6, autoreverses: true)) {
@@ -127,17 +127,20 @@ struct ArenaPhaseView: View {
                 }
             }) {
                 HStack(spacing: 8) {
-                    Image(systemName: "bolt.fill")
+                    Image(systemName: vm.hasAttackedThisTurn ? "hourglass" : "bolt.fill")
                         .font(.system(size: 18))
-                    Text("ATTACK")
+                    Text(vm.hasAttackedThisTurn ? "ATTACK USED" : "ATTACK")
                         .font(.system(size: 18, weight: .heavy, design: .rounded))
                 }
                 .foregroundColor(.white)
                 .frame(width: 200)
                 .padding(.vertical, 14)
-                .background(GameTheme.hpRed)
+                .background(vm.hasAttackedThisTurn ? GameTheme.hpRed.opacity(0.35) : GameTheme.hpRed)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
+            .disabled(vm.hasAttackedThisTurn)
+            .accessibilityLabel(vm.hasAttackedThisTurn ? "Attack already used this turn" : "Attack opponent")
+            .accessibilityHint("End your turn to attack again")
 
             Spacer()
 

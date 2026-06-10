@@ -179,37 +179,32 @@ struct RaidPhaseView: View {
         .padding(.vertical, 8)
     }
 
-    // MARK: - Right Column (AI / Opponent)
+    // MARK: - Right Column (Raid Progress)
 
     private var rightColumn: some View {
         VStack(spacing: 8) {
-            // AI avatar
-            Circle()
-                .fill(Color.gray.opacity(0.3))
-                .frame(width: 80, height: 80)
-                .overlay(
-                    Image(systemName: "person.fill")
-                        .font(.system(size: 30))
-                        .foregroundColor(GameTheme.hpRed)
-                )
-                .overlay(
-                    Circle().stroke(GameTheme.hpRed.opacity(0.4), lineWidth: 2)
-                )
+            Text("RAID")
+                .font(.system(size: 12, weight: .black, design: .rounded))
+                .tracking(2)
+                .foregroundColor(GameTheme.gold)
+                .padding(.top, 8)
 
-            // AI name
-            Text(vm.aiName)
-                .font(.system(size: 11, weight: .bold, design: .rounded))
-                .foregroundColor(.white)
-                .lineLimit(1)
+            // Chest progress indicators (3 chests per raid)
+            VStack(spacing: 6) {
+                ForEach(1...GameSession.maxChests, id: \.self) { tier in
+                    chestProgressRow(tier: tier)
+                }
+            }
+            .accessibilityLabel("\(vm.chestsBroken) of \(GameSession.maxChests) chests broken")
 
-            // AI HP bar
-            HPBarView(current: vm.aiHP, max: vm.aiMaxHP, height: 12)
-                .frame(width: 100)
+            Spacer()
 
-            // AI HP number
-            Text("\(vm.aiHP) HP")
-                .font(.system(size: 10, weight: .heavy, design: .rounded))
-                .foregroundColor(GameTheme.hpRed)
+            // Turn counter
+            infoRow(icon: "clock.fill", label: "Turn \(vm.currentTurn)")
+
+            // Deck & discard counts
+            infoRow(icon: "rectangle.stack.fill", label: "Deck \(vm.deckCount)")
+            infoRow(icon: "tray.fill", label: "Used \(vm.discardCount)")
 
             Spacer()
 
@@ -219,31 +214,45 @@ struct RaidPhaseView: View {
                 .foregroundColor(.white.opacity(0.3))
                 .tracking(2)
 
-            // Gear slots vertical
-            VStack(spacing: 4) {
-                gearSlotRow(.head)
-                gearSlotRow(.chest)
-                gearSlotRow(.hands)
-                gearSlotRow(.feet)
-                gearSlotRow(.weapon)
-            }
+            // Player's equipped gear
+            GearSlotsView(gear: vm.activeGear, compact: true)
         }
         .padding(.vertical, 12)
     }
 
-    // MARK: - Gear Slot Helper
+    @ViewBuilder
+    private func chestProgressRow(tier: Int) -> some View {
+        let isBroken = tier <= vm.chestsBroken
+        let isCurrent = tier == vm.chestsBroken + 1
 
-    private func gearSlotRow(_ slot: GearSlot) -> some View {
-        let equipped = vm.activeGear.card(in: slot)
-        return RoundedRectangle(cornerRadius: 4)
-            .fill(equipped != nil ? GameTheme.cardBackground : Color.gray.opacity(0.15))
-            .frame(width: 28, height: 28)
-            .overlay(
-                RoundedRectangle(cornerRadius: 4)
-                    .stroke(
-                        equipped != nil ? GameTheme.rarityColor(equipped!.rarity) : Color.white.opacity(0.1),
-                        lineWidth: 1
-                    )
-            )
+        HStack(spacing: 6) {
+            Image(systemName: isBroken ? "checkmark.seal.fill" : "shippingbox.fill")
+                .font(.system(size: 13))
+                .foregroundColor(
+                    isBroken ? GameTheme.hpGreen :
+                    isCurrent ? GameTheme.gold : .white.opacity(0.25)
+                )
+
+            Text("Tier \(tier)")
+                .font(.system(size: 11, weight: isCurrent ? .bold : .medium, design: .rounded))
+                .foregroundColor(isCurrent ? .white : .white.opacity(isBroken ? 0.6 : 0.35))
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .frame(width: 100, alignment: .leading)
+        .background(isCurrent ? GameTheme.gold.opacity(0.12) : Color.white.opacity(0.04))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func infoRow(icon: String, label: String) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 10))
+                .foregroundColor(.white.opacity(0.4))
+            Text(label)
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundColor(.white.opacity(0.7))
+        }
+        .frame(width: 100, alignment: .leading)
     }
 }
