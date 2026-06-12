@@ -9,16 +9,12 @@ struct GameScreenView: View {
 
     var body: some View {
         ZStack {
-            // Background gradient
-            LinearGradient(
-                colors: [
-                    Color(red: 15/255, green: 23/255, blue: 42/255),
-                    Color(red: 30/255, green: 41/255, blue: 59/255)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
+            // Painted backdrop for the current phase
+            ArtBackground(
+                imageName: vm.phase == .raid ? GameAssets.raidBackground : GameAssets.arenaBackground,
+                darken: 0.5
             )
-            .ignoresSafeArea()
+            .animation(.easeInOut(duration: 0.6), value: vm.phase)
 
             // Phase content
             switch vm.phase {
@@ -89,6 +85,11 @@ struct PauseMenuView: View {
                         icon: settings.soundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill",
                         title: "Sound",
                         isOn: $settings.soundEnabled
+                    )
+                    toggleRow(
+                        icon: "music.note",
+                        title: "Music",
+                        isOn: $settings.musicEnabled
                     )
                     toggleRow(
                         icon: "iphone.radiowaves.left.and.right",

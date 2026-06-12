@@ -79,6 +79,9 @@ final class GameViewModel {
         session.playerChampion?.name ?? "Champion"
     }
 
+    var playerChampionId: String? { session.playerChampion?.stringId }
+    var aiChampionId: String? { aiState?.champion.stringId }
+
     var opponentDisplayName: String {
         aiState?.champion.name ?? "Treasure Vault"
     }
@@ -139,7 +142,7 @@ final class GameViewModel {
 
         // Check chest destroyed
         if chest.isDestroyed {
-            SoundManager.shared.play(.coin)
+            SoundManager.shared.play(.chestBreak)
             engine.advanceChest(session: &session)
             if session.phase == .raid {
                 spawnChest()
@@ -311,20 +314,20 @@ final class GameViewModel {
     }
 
     /// AI opponents the player can face in the arena, mirroring the starter
-    /// roster. String ids are AI-specific so champion innates and tier
-    /// effects never apply to the scripted opponent.
-    private static let opponentRoster: [(name: String, archetype: Archetype, hp: Int, avoidance: Int, mitigation: Int, passive: String)] = [
-        ("Lyra Swiftblade", .rogue, 24, 16, 1, "First Blood"),
-        ("Vex the Ironclad", .warrior, 30, 12, 3, "Unyielding"),
-        ("Grizzak the Unbroken", .berserker, 35, 9, 0, "Blood Rage"),
-        ("Zara the Voidwalker", .shadow, 25, 14, 1, "Void Siphon")
+    /// roster. Their string ids match the catalog so portrait art resolves;
+    /// the engine never evaluates champion effects for the scripted opponent.
+    private static let opponentRoster: [(stringId: String, name: String, archetype: Archetype, hp: Int, avoidance: Int, mitigation: Int, passive: String)] = [
+        ("champ_002", "Lyra Swiftblade", .rogue, 24, 16, 1, "First Blood"),
+        ("champ_001", "Vex the Ironclad", .warrior, 30, 12, 3, "Unyielding"),
+        ("champ_005", "Grizzak the Unbroken", .berserker, 35, 9, 0, "Blood Rage"),
+        ("champ_006", "Zara the Voidwalker", .shadow, 25, 14, 1, "Void Siphon")
     ]
 
     private func setupArena() {
         // Pick a random arena opponent
         let pick = Self.opponentRoster.randomElement() ?? Self.opponentRoster[0]
         let opponent = Champion(
-            stringId: "ai_opponent", name: pick.name, archetype: pick.archetype,
+            stringId: pick.stringId, name: pick.name, archetype: pick.archetype,
             hp: pick.hp, avoidance: pick.avoidance, mitigation: pick.mitigation,
             innatePassive: InnatePassive(name: pick.passive, effectDescription: pick.passive),
             tierEffects: []

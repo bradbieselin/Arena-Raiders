@@ -13,62 +13,132 @@ enum GameSound: CaseIterable {
     case miss
     case cardPlay
     case coin
+    case chestBreak
     case packOpen
     case victory
     case defeat
     case buttonTap
+
+    /// Base name of the bundled audio file in Resources/Audio.
+    var fileName: String {
+        switch self {
+        case .roll: return "sfx_roll"
+        case .hit: return "sfx_hit"
+        case .crit: return "sfx_crit"
+        case .miss: return "sfx_miss"
+        case .cardPlay: return "sfx_card"
+        case .coin: return "sfx_coin"
+        case .chestBreak: return "sfx_chest"
+        case .packOpen: return "sfx_pack"
+        case .victory: return "sfx_victory"
+        case .defeat: return "sfx_defeat"
+        case .buttonTap: return "sfx_card"
+        }
+    }
+}
+
+// MARK: - Audio Session
+
+enum AudioSession {
+    private static var isConfigured = false
+
+    static func configureIfNeeded() {
+        guard !isConfigured else { return }
+        isConfigured = true
+        #if os(iOS)
+        try? AVAudioSession.sharedInstance().setCategory(.ambient, options: .mixWithOthers)
+        try? AVAudioSession.sharedInstance().setActive(true)
+        #endif
+    }
 }
 
 // MARK: - Sound Manager
-// Synthesizes short UI tones at runtime (no bundled audio assets) and plays
-// them through a single AVAudioEngine. All playback is gated by GameSettings.
+// Plays bundled, AI-produced sound effects from Resources/Audio. If a file is
+// missing (or fails to load) it falls back to a short synthesized tone so the
+// game always has audible feedback. Gated by GameSettings.
 
 final class SoundManager {
     static let shared = SoundManager()
 
+    private var players: [GameSound: AVAudioPlayer] = [:]
+    private var missingFiles: Set<GameSound> = []
+
+    // Synthesized fallback
     private let engine = AVAudioEngine()
-    private let player = AVAudioPlayerNode()
+    private let synthPlayer = AVAudioPlayerNode()
+    private var synthBuffers: [GameSound: AVAudioPCMBuffer] = [:]
+    private var synthConfigured = false
     private let sampleRate: Double = 44_100
-    private var buffers: [GameSound: AVAudioPCMBuffer] = [:]
-    private var isConfigured = false
 
     private init() {}
 
     func play(_ sound: GameSound) {
         guard GameSettings.shared.soundEnabled else { return }
+        AudioSession.configureIfNeeded()
 
-        configureIfNeeded()
+        if let player = bundledPlayer(for: sound) {
+            player.currentTime = 0
+            player.play()
+        } else {
+            playSynthesized(sound)
+        }
+    }
+
+    // MARK: - Bundled Audio
+
+    private func bundledPlayer(for sound: GameSound) -> AVAudioPlayer? {
+        if let cached = players[sound] { return cached }
+        guard !missingFiles.contains(sound) else { return nil }
+
+        guard let url = Self.audioURL(named: sound.fileName),
+              let player = try? AVAudioPlayer(contentsOf: url) else {
+            missingFiles.insert(sound)
+            return nil
+        }
+
+        player.volume = 0.9
+        player.prepareToPlay()
+        players[sound] = player
+        return player
+    }
+
+    /// Looks up an audio file in the bundled Audio folder, trying common extensions.
+    static func audioURL(named name: String) -> URL? {
+        for ext in ["mp3", "m4a", "wav"] {
+            if let url = Bundle.main.url(forResource: name, withExtension: ext, subdirectory: "Audio") {
+                return url
+            }
+            if let url = Bundle.main.url(forResource: name, withExtension: ext) {
+                return url
+            }
+        }
+        return nil
+    }
+
+    // MARK: - Synthesized Fallback
+
+    private func playSynthesized(_ sound: GameSound) {
+        configureSynthIfNeeded()
         if !engine.isRunning {
             try? engine.start()
         }
-        guard engine.isRunning, let buffer = buffers[sound] else { return }
+        guard engine.isRunning, let buffer = synthBuffers[sound] else { return }
 
-        player.scheduleBuffer(buffer, at: nil, options: .interrupts, completionHandler: nil)
-        if !player.isPlaying {
-            player.play()
+        synthPlayer.scheduleBuffer(buffer, at: nil, options: .interrupts, completionHandler: nil)
+        if !synthPlayer.isPlaying {
+            synthPlayer.play()
         }
     }
 
-    // MARK: - Setup
-
-    private func configureIfNeeded() {
-        guard !isConfigured else { return }
-        isConfigured = true
-
-        #if os(iOS)
-        try? AVAudioSession.sharedInstance().setCategory(.ambient, options: .mixWithOthers)
-        try? AVAudioSession.sharedInstance().setActive(true)
-        #endif
+    private func configureSynthIfNeeded() {
+        guard !synthConfigured else { return }
+        synthConfigured = true
 
         guard let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1) else { return }
-        engine.attach(player)
-        engine.connect(player, to: engine.mainMixerNode, format: format)
+        engine.attach(synthPlayer)
+        engine.connect(synthPlayer, to: engine.mainMixerNode, format: format)
         engine.mainMixerNode.outputVolume = 0.8
 
-        buildBuffers(format: format)
-    }
-
-    private func buildBuffers(format: AVAudioFormat) {
         // Each sound is a sequence of (frequency Hz, duration seconds) tones.
         let definitions: [GameSound: [(Double, Double)]] = [
             .roll: [(320, 0.05), (420, 0.05), (540, 0.06)],
@@ -84,7 +154,7 @@ final class SoundManager {
         ]
 
         for (sound, segments) in definitions {
-            buffers[sound] = makeBuffer(segments: segments, format: format)
+            synthBuffers[sound] = makeBuffer(segments: segments, format: format)
         }
     }
 
@@ -116,6 +186,65 @@ final class SoundManager {
             }
         }
         return buffer
+    }
+}
+
+// MARK: - Music Manager
+// Loops the bundled, AI-composed background tracks and reacts to the music
+// setting and screen changes. Silently does nothing if tracks are missing.
+
+final class MusicManager {
+    static let shared = MusicManager()
+
+    enum Track: String {
+        case menu = "music_menu"
+        case battle = "music_battle"
+    }
+
+    private var player: AVAudioPlayer?
+    private var currentTrack: Track?
+    /// The track that should be playing, even while music is toggled off.
+    private var desiredTrack: Track?
+
+    private init() {}
+
+    func play(_ track: Track) {
+        desiredTrack = track
+        guard GameSettings.shared.musicEnabled else { return }
+        guard track != currentTrack || player?.isPlaying != true else { return }
+
+        AudioSession.configureIfNeeded()
+        guard let url = SoundManager.audioURL(named: track.rawValue),
+              let newPlayer = try? AVAudioPlayer(contentsOf: url) else { return }
+
+        player?.stop()
+        newPlayer.numberOfLoops = -1
+        newPlayer.volume = 0.35
+        newPlayer.prepareToPlay()
+        newPlayer.play()
+        player = newPlayer
+        currentTrack = track
+    }
+
+    func stop() {
+        desiredTrack = nil
+        player?.stop()
+        player = nil
+        currentTrack = nil
+    }
+
+    /// Called when the music setting toggles: pause or resume the desired track.
+    func musicSettingChanged() {
+        if GameSettings.shared.musicEnabled {
+            if let desiredTrack {
+                currentTrack = nil // force restart
+                play(desiredTrack)
+            }
+        } else {
+            player?.stop()
+            player = nil
+            currentTrack = nil
+        }
     }
 }
 

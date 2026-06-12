@@ -18,13 +18,16 @@ Winning earns gold (more for every chest you broke). Conceding earns nothing.
 - **Deck builder** — 40-card decks, max 2 copies per card, one gear card per slot
 - **Shop** — three card pack tiers with rarity-weighted pulls (60/25/12/3), guaranteed-rarity slots, a pack-opening reveal, and a daily gold bonus
 - **Meta progression** — win streaks, match history, and stat-derived achievements
-- **Production polish** — synthesized sound effects (no bundled assets), haptics, persisted settings, first-launch tutorial, pause/concede menu, victory & defeat screens with rewards, accessibility labels, custom app icon
+- **Full AI-produced art direction** — painted champion portraits, raid-vault and arena backdrops, tiered treasure chest art, card back, pack art, and app icon in a consistent dark-fantasy navy & gold style
+- **Original audio** — two looping orchestral tracks (menu and battle) plus a full foley SFX set (dice, hits, crits, chest break, pack rip, coins, fanfares), with a synthesized fallback if any file is missing
+- **Production polish** — haptics, persisted sound/music/haptics settings, first-launch tutorial, pause/concede menu, victory & defeat screens with rewards, accessibility labels
 
 ## Architecture
 
 ```
 ArenaRaiders/
-├── Core/            GameSettings (persisted prefs), AudioHaptics, Achievements
+├── Core/            GameSettings (persisted prefs), AudioHaptics (SFX/music/
+│                    haptics), GameAssets (art registry), Achievements
 ├── Models/          SwiftData models (Card, Champion, Deck, PlayerProfile)
 │                    + value-type game state (GameSession, CardReference)
 ├── GameEngine/      Pure game rules: dice, combat resolution, card effects,
@@ -32,9 +35,13 @@ ArenaRaiders/
 ├── ViewModels/      AppState (navigation), GameViewModel (match orchestration)
 ├── Data/            SwiftData container, starter-data seeding, save system,
 │                    pack-opening economy
+├── Resources/Audio/ Music loops and foley SFX (bundled as a folder reference)
 └── Views/           SwiftUI screens (landscape): Play, Collection, Deck Builder,
                      Shop, Profile, and the in-game board
 ```
+
+Every artwork lookup goes through `GameAssets`, which falls back to SF Symbols
+and gradients when an asset is absent — the game never hard-depends on art.
 
 Key design points:
 

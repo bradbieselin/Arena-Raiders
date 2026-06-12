@@ -24,7 +24,7 @@ struct PlayView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                GameTheme.darkNavy.ignoresSafeArea()
+                ArtBackground(imageName: GameAssets.menuBackground, darken: 0.55)
 
                 ScrollView {
                     VStack(spacing: 20) {
@@ -120,9 +120,12 @@ struct PlayView: View {
         } label: {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
-                    Image(systemName: archetypeIcon(deck.champion?.archetype))
-                        .font(.system(size: 18))
-                        .foregroundColor(isSelected ? GameTheme.gold : .white.opacity(0.7))
+                    ChampionPortraitView(
+                        championId: deck.champion?.stringId,
+                        fallbackIcon: archetypeIcon(deck.champion?.archetype),
+                        size: 40,
+                        ringColor: isSelected ? GameTheme.gold : GameTheme.gold.opacity(0.4)
+                    )
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text(deck.name)

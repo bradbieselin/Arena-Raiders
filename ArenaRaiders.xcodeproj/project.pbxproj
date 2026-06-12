@@ -71,6 +71,8 @@
 		A10000010000000000000096 /* PackOpenerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000096; };
 		A10000010000000000000097 /* AchievementsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000097; };
 		A10000010000000000000098 /* MetaProgressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000098; };
+		A10000010000000000000099 /* GameAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000099; };
+		A10000010000000000000100 /* Audio in Resources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000100; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -133,6 +135,8 @@
 		A20000010000000000000096 /* PackOpenerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackOpenerTests.swift; sourceTree = "<group>"; };
 		A20000010000000000000097 /* AchievementsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementsTests.swift; sourceTree = "<group>"; };
 		A20000010000000000000098 /* MetaProgressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetaProgressionTests.swift; sourceTree = "<group>"; };
+		A20000010000000000000099 /* GameAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameAssets.swift; sourceTree = "<group>"; };
+		A20000010000000000000100 /* Audio */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources/Audio; sourceTree = "<group>"; };
 		A20000010000000000000070 /* RollDistributionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollDistributionTests.swift; sourceTree = "<group>"; };
 		A20000010000000000000071 /* ResourceEconomyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceEconomyTests.swift; sourceTree = "<group>"; };
 		A20000010000000000000072 /* GearSlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GearSlotTests.swift; sourceTree = "<group>"; };
@@ -211,6 +215,7 @@
 				A40000010000000000000006 /* GameEngine */,
 				A40000010000000000000007 /* Data */,
 				A20000010000000000000003 /* Assets.xcassets */,
+				A20000010000000000000100 /* Audio */,
 				A40000010000000000000008 /* Preview Content */,
 			);
 			path = ArenaRaiders;
@@ -222,6 +227,7 @@
 				A20000010000000000000090 /* GameSettings.swift */,
 				A20000010000000000000091 /* AudioHaptics.swift */,
 				A20000010000000000000092 /* Achievements.swift */,
+				A20000010000000000000099 /* GameAssets.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -422,6 +428,7 @@
 				A10000010000000000000004 /* Preview Assets.xcassets in Resources */,
 				A10000010000000000000003 /* Assets.xcassets in Resources */,
 				A10000010000000000000042 /* arena_raiders_starter_data.json in Resources */,
+				A10000010000000000000100 /* Audio in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -471,6 +478,7 @@
 				A10000010000000000000093 /* PackOpener.swift in Sources */,
 				A10000010000000000000094 /* HowToPlayView.swift in Sources */,
 				A10000010000000000000095 /* GameOverView.swift in Sources */,
+				A10000010000000000000099 /* GameAssets.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

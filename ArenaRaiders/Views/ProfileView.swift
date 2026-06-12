@@ -304,16 +304,19 @@ struct ProfileView: View {
     @ViewBuilder
     private func championPortrait(_ champion: Champion, unlocked: Bool) -> some View {
         VStack(spacing: 6) {
-            ZStack {
-                Circle()
-                    .fill(unlocked ? GameTheme.cardBackground : Color.black.opacity(0.5))
-                    .frame(width: 64, height: 64)
+            if unlocked {
+                ChampionPortraitView(
+                    championId: champion.stringId,
+                    fallbackIcon: archetypeIcon(champion.archetype),
+                    size: 64,
+                    ringColor: GameTheme.rarityColor(champion.rarity)
+                )
+            } else {
+                ZStack {
+                    Circle()
+                        .fill(Color.black.opacity(0.5))
+                        .frame(width: 64, height: 64)
 
-                if unlocked {
-                    Image(systemName: archetypeIcon(champion.archetype))
-                        .font(.title2)
-                        .foregroundColor(GameTheme.rarityColor(champion.rarity))
-                } else {
                     Image(systemName: "person.fill.questionmark")
                         .font(.title3)
                         .foregroundColor(.gray.opacity(0.4))
@@ -379,6 +382,13 @@ struct ProfileView: View {
                 settingsRow(icon: settings.soundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill",
                             title: "Sound Effects") {
                     Toggle("Sound Effects", isOn: $settings.soundEnabled)
+                        .labelsHidden()
+                        .tint(GameTheme.gold)
+                }
+
+                // Music toggle (persisted)
+                settingsRow(icon: "music.note", title: "Music") {
+                    Toggle("Music", isOn: $settings.musicEnabled)
                         .labelsHidden()
                         .tint(GameTheme.gold)
                 }

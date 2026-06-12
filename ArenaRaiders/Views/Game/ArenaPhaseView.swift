@@ -42,18 +42,8 @@ struct ArenaPhaseView: View {
 
     private var leftColumn: some View {
         VStack(spacing: 8) {
-            // Player avatar
-            Circle()
-                .fill(Color.gray.opacity(0.3))
-                .frame(width: 80, height: 80)
-                .overlay(
-                    Image(systemName: "person.fill")
-                        .font(.system(size: 30))
-                        .foregroundColor(GameTheme.gold)
-                )
-                .overlay(
-                    Circle().stroke(GameTheme.gold.opacity(0.4), lineWidth: 2)
-                )
+            // Player portrait
+            ChampionPortraitView(championId: vm.playerChampionId, size: 80)
 
             Text(vm.championName)
                 .font(.system(size: 11, weight: .bold, design: .rounded))
@@ -167,18 +157,8 @@ struct ArenaPhaseView: View {
 
     private var rightColumn: some View {
         VStack(spacing: 8) {
-            // AI avatar
-            Circle()
-                .fill(Color.gray.opacity(0.3))
-                .frame(width: 80, height: 80)
-                .overlay(
-                    Image(systemName: "person.fill")
-                        .font(.system(size: 30))
-                        .foregroundColor(GameTheme.hpRed)
-                )
-                .overlay(
-                    Circle().stroke(GameTheme.hpRed.opacity(0.4), lineWidth: 2)
-                )
+            // Opponent portrait
+            ChampionPortraitView(championId: vm.aiChampionId, size: 80, ringColor: GameTheme.hpRed)
                 .offset(x: aiShake ? -4 : 0)
 
             Text(vm.aiName)

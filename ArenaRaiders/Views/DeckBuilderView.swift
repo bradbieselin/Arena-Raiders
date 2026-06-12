@@ -102,19 +102,13 @@ struct DeckBuilderView: View {
                             selectedChampion = champion
                         } label: {
                             VStack(spacing: 4) {
-                                ZStack {
-                                    Circle()
-                                        .fill(isSelected ? GameTheme.gold.opacity(0.25) : GameTheme.cardBackground)
-                                        .frame(width: 56, height: 56)
-                                        .overlay(
-                                            Circle()
-                                                .stroke(isSelected ? GameTheme.gold : Color.clear, lineWidth: 2)
-                                        )
-
-                                    Image(systemName: archetypeIcon(champion.archetype))
-                                        .font(.title3)
-                                        .foregroundColor(isSelected ? GameTheme.gold : .white.opacity(0.6))
-                                }
+                                ChampionPortraitView(
+                                    championId: champion.stringId,
+                                    fallbackIcon: archetypeIcon(champion.archetype),
+                                    size: 56,
+                                    ringColor: isSelected ? GameTheme.gold : Color.white.opacity(0.25)
+                                )
+                                .opacity(isSelected ? 1.0 : 0.75)
 
                                 Text(champion.name)
                                     .font(.system(size: 9, weight: isSelected ? .bold : .medium))

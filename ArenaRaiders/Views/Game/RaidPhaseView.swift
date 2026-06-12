@@ -40,18 +40,8 @@ struct RaidPhaseView: View {
 
     private var leftColumn: some View {
         VStack(spacing: 8) {
-            // Player avatar
-            Circle()
-                .fill(Color.gray.opacity(0.3))
-                .frame(width: 80, height: 80)
-                .overlay(
-                    Image(systemName: "person.fill")
-                        .font(.system(size: 30))
-                        .foregroundColor(GameTheme.gold)
-                )
-                .overlay(
-                    Circle().stroke(GameTheme.gold.opacity(0.4), lineWidth: 2)
-                )
+            // Player portrait
+            ChampionPortraitView(championId: vm.playerChampionId, size: 80)
 
             // Player name
             Text(vm.championName)
@@ -113,15 +103,26 @@ struct RaidPhaseView: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(GameTheme.darkNavy)
-                    .frame(width: 140, height: 180)
+                    .frame(width: 150, height: 170)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(GameTheme.gold, lineWidth: 2)
                     )
+                    .shadow(color: GameTheme.gold.opacity(0.25), radius: 12)
 
-                VStack(spacing: 8) {
-                    Text("📦")
-                        .font(.system(size: 36))
+                VStack(spacing: 6) {
+                    if let art = GameAssets.chestImage(tier: vm.chest?.tier ?? 1) {
+                        Image(art)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 134, height: 110)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    } else {
+                        Text("📦")
+                            .font(.system(size: 44))
+                            .frame(height: 100)
+                    }
+
                     Text("Treasure Chest")
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
@@ -129,7 +130,10 @@ struct RaidPhaseView: View {
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(GameTheme.gold.opacity(0.7))
                 }
+                .padding(.vertical, 8)
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Tier \(vm.chest?.tier ?? 1) treasure chest, \(vm.chestHP) of \(vm.chestMaxIntegrity) integrity")
 
             // Chest HP bar
             HPBarView(

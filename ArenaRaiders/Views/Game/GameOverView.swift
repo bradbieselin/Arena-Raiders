@@ -16,11 +16,24 @@ struct GameOverView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 18) {
-                // Result banner
-                Image(systemName: vm.didPlayerWin ? "trophy.fill" : "shield.slash.fill")
-                    .font(.system(size: 56))
-                    .foregroundColor(vm.didPlayerWin ? GameTheme.gold : GameTheme.hpRed)
-                    .scaleEffect(showContent ? 1 : 0.4)
+                // Winner portrait with result badge
+                ZStack(alignment: .bottomTrailing) {
+                    ChampionPortraitView(
+                        championId: vm.didPlayerWin ? vm.playerChampionId : vm.aiChampionId,
+                        fallbackIcon: vm.didPlayerWin ? "trophy.fill" : "shield.slash.fill",
+                        size: 84,
+                        ringColor: vm.didPlayerWin ? GameTheme.gold : GameTheme.hpRed
+                    )
+
+                    Image(systemName: vm.didPlayerWin ? "trophy.fill" : "xmark")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(GameTheme.darkNavy)
+                        .padding(7)
+                        .background(vm.didPlayerWin ? GameTheme.gold : GameTheme.hpRed)
+                        .clipShape(Circle())
+                        .offset(x: 4, y: 4)
+                }
+                .scaleEffect(showContent ? 1 : 0.4)
 
                 Text(vm.didPlayerWin ? "VICTORY" : "DEFEAT")
                     .font(.system(size: 36, weight: .black, design: .rounded))

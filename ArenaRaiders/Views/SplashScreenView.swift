@@ -11,8 +11,7 @@ struct SplashScreenView: View {
 
     var body: some View {
         ZStack {
-            darkNavy
-                .ignoresSafeArea()
+            ArtBackground(imageName: GameAssets.menuBackground, darken: 0.35)
 
             VStack(spacing: 32) {
                 // Placeholder logo

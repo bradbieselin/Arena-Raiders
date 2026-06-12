@@ -21,6 +21,12 @@ struct ContentView: View {
                 }
             }
         }
+        .onAppear {
+            MusicManager.shared.play(.menu)
+        }
+        .onChange(of: appState.currentScreen) { _, screen in
+            MusicManager.shared.play(screen == .game ? .battle : .menu)
+        }
     }
 }
 

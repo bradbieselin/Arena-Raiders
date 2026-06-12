@@ -161,10 +161,23 @@ struct ShopView: View {
         let affordable = (profile?.currency ?? 0) >= pack.price
 
         VStack(spacing: 8) {
-            Image(systemName: pack.icon)
-                .font(.system(size: 34))
-                .foregroundStyle(packColor(pack))
-                .frame(height: 44)
+            if let art = GameAssets.assetIfPresent(GameAssets.packArt) {
+                Image(art)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 84, height: 104)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(packColor(pack).opacity(0.8), lineWidth: 2)
+                    )
+                    .shadow(color: packColor(pack).opacity(0.5), radius: 8)
+            } else {
+                Image(systemName: pack.icon)
+                    .font(.system(size: 34))
+                    .foregroundStyle(packColor(pack))
+                    .frame(height: 44)
+            }
 
             Text(pack.name)
                 .font(.system(size: 15, weight: .bold, design: .rounded))
@@ -335,19 +348,32 @@ struct PackOpeningView: View {
         .accessibilityHint(isRevealed ? "" : "Tap to reveal")
     }
 
+    @ViewBuilder
     private var cardBack: some View {
-        RoundedRectangle(cornerRadius: 12)
-            .fill(GameTheme.cardBackground)
-            .frame(width: 110, height: 150)
-            .overlay(
-                Image(systemName: "shield.lefthalf.filled")
-                    .font(.system(size: 30))
-                    .foregroundColor(GameTheme.gold.opacity(0.4))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(GameTheme.gold.opacity(0.3), lineWidth: 1.5)
-            )
+        if let art = GameAssets.assetIfPresent(GameAssets.cardBack) {
+            Image(art)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 110, height: 150)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(GameTheme.gold.opacity(0.5), lineWidth: 1.5)
+                )
+        } else {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(GameTheme.cardBackground)
+                .frame(width: 110, height: 150)
+                .overlay(
+                    Image(systemName: "shield.lefthalf.filled")
+                        .font(.system(size: 30))
+                        .foregroundColor(GameTheme.gold.opacity(0.4))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(GameTheme.gold.opacity(0.3), lineWidth: 1.5)
+                )
+        }
     }
 
     private func cardFront(_ card: Card) -> some View {
